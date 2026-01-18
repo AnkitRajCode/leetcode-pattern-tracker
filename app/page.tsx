@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { BookOpen, Code2, Cpu, GraduationCap } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "LeetCode Pattern Tracker - Home",
+  description: "Stop memorizing solutions. Start mastering patterns. The ultimate tracker for Blind 75, NeetCode, and pattern-based DSA interview preparation.",
+};
 
 const topics = [
   { id: "arrays", name: "Arrays & Hashing", icon: <Code2 className="text-blue-500" />, description: "Master the foundation of DSA with pattern-based array problems." },
