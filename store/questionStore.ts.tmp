@@ -1,0 +1,10 @@
+import { Question } from "../types/question";
+import arraysData from "../data/arrays.json";
+import stringsData from "../data/strings.json";
+import dpData from "../data/dp.json";
+
+const arrays = arraysData.map(q => ({ ...q, videoSolution: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" })) as Question[];
+const strings = stringsData.map(q => ({ ...q, videoSolution: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" })) as Question[];
+const dp = dpData.map(q => ({ ...q, videoSolution: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" })) as Question[];
+
+// ... rest of the file ...
