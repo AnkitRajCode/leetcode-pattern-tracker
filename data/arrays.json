@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Two Sum",
+    "url": "https://leetcode.com/problems/two-sum/",
+    "difficulty": "easy",
+    "tag": "array",
+    "pattern": ["HashMap", "Two Pointer"],
+    "revision": false,
+    "solved": true,
+    "top100": false,
+    "lovebabbar": false,
+    "striver": false,
+    "neetcode": false,
+    "interviewMemoryTrick": "Check first, store later",
+    "companyTags": ["Amazon", "Google"],
+    "notes": "",
+    "videoSolution": "",
+    "textSolution": "Use HashMap. For each element, check if target - num exists."
+  }
+]
