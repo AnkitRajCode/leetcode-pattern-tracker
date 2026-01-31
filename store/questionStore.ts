@@ -17,6 +17,15 @@ export type FilterState = {
     difficulties: string[];
     blind75: boolean | null;
     neetcode: boolean | null;
+    top100: boolean | null;
+    lovebabbar: boolean | null;
+    striver: boolean | null;
+    grind75: boolean | null;
+    apnaCollege: boolean | null;
+    algoPrep: boolean | null;
+    arshDSASheet: boolean | null;
+    algoMaster: boolean | null;
+    instabyte: boolean | null;
     companies: string[];
     searchQuery: string;
 };
@@ -42,6 +51,15 @@ export const useQuestionStore = create<Store>()(
                 difficulties: [],
                 blind75: null,
                 neetcode: null,
+                top100: null,
+                lovebabbar: null,
+                striver: null,
+                grind75: null,
+                apnaCollege: null,
+                algoPrep: null,
+                arshDSASheet: null,
+                algoMaster: null,
+                instabyte: null,
                 companies: [],
                 searchQuery: "",
             },
@@ -85,6 +103,15 @@ export const useQuestionStore = create<Store>()(
                         difficulties: [],
                         blind75: null,
                         neetcode: null,
+                        top100: null,
+                        lovebabbar: null,
+                        striver: null,
+                        grind75: null,
+                        apnaCollege: null,
+                        algoPrep: null,
+                        arshDSASheet: null,
+                        algoMaster: null,
+                        instabyte: null,
                         companies: [],
                         searchQuery: "",
                     },

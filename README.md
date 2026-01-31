@@ -38,9 +38,15 @@ YouTube Playlist: [Watch here](https://www.youtube.com/watch?v=0Rwb4Xmlcwc&list=
 ### Tech Interview Handbook
 - [Tech Interview Handbook - GitHub](https://github.com/yangshun/tech-interview-handbook)
 
+### DSA Patterns & Roadmaps
+- [DSA Patterns Roadmap - KushalVijay](https://github.com/KushalVijay/DSA-patterns-Roadmap) 
+
 ### Data Structures Visualization
 - [CSVIZ Tool - ArrayList](https://csvistool.com/ArrayList)
 - [VisuAlgo - Data Structures & Algorithms](https://visualgo.net/en)
+
+### Interview Master Resources
+- [Interview Master 100 - Instabyte](https://instabyte.io/p/interview-master-100)
 
 ---
 
@@ -52,3 +58,24 @@ YouTube Playlist: [Watch here](https://www.youtube.com/watch?v=0Rwb4Xmlcwc&list=
 
 ### DSA Sheets
 - [Striver's 79 Last Moment DSA Sheet](https://takeuforward.org/dsa/strivers-79-last-moment-dsa-sheet-ace-interviews)
+
+---
+
+## GitHub Repositories
+
+### Java & Spring
+- [Java Code Examples - navinreddy20](https://github.com/navinreddy20/Javacode)
+- [Spring 6 Course - navinreddy20](https://github.com/navinreddy20/spring6-course)
+- [Microservices Tutorials - navinreddy20](https://github.com/navinreddy20/MicroserviceTutorials)
+
+### DSA & Patterns
+- [DSA Patterns Roadmap - KushalVijay](https://github.com/KushalVijay/DSA-patterns-Roadmap)
+
+### AI/ML & LangChain
+- [LangChain and Ollama - laxmimerit](https://github.com/laxmimerit/LangChain-and-Ollama)
+
+### Frontend & Angular
+- [Angular Interview Questions - sudheerj](https://github.com/sudheerj/angular-interview-questions)
+
+### 
+- [SDE Sheets - bio.link](https://sdesheets.bio.link/)

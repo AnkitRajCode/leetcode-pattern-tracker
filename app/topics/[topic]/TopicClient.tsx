@@ -4,9 +4,11 @@ import { useEffect, useMemo } from "react";
 import { useQuestionStore } from "@/store/questionStore";
 import QuestionTable from "@/components/table/QuestionTable";
 import FilterSection from "@/components/table/FilterSection";
-import { MoveLeft } from "lucide-react";
+import { MoveLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import CheatSheet from "@/components/topic/CheatSheet";
+import Footer from "@/components/Footer";
 
 interface TopicClientProps {
     topic: string;
@@ -23,17 +25,30 @@ export default function TopicClient({ topic }: TopicClientProps) {
     }, [topic, loadTopic]);
 
     const filteredQuestions = useMemo(() => {
+        const activeListFilters = [
+            'blind75', 'neetcode', 'top100', 'lovebabbar', 'striver',
+            'grind75', 'apnaCollege', 'algoPrep', 'arshDSASheet',
+            'algoMaster', 'instabyte'
+        ].filter(key => filters[key as keyof typeof filters] === true);
+
         return allQuestions.filter(q => {
             const matchesSearch = q.title.toLowerCase().includes(filters.searchQuery.toLowerCase());
             const matchesPattern = filters.patterns.length === 0 || q.pattern.some(p => filters.patterns.includes(p));
             const matchesDifficulty = filters.difficulties.length === 0 || filters.difficulties.includes(q.difficulty);
 
-            const matchesBlind75 = filters.blind75 === null || q.blind75 === filters.blind75;
-            const matchesNeetcode = filters.neetcode === null || q.neetcode === filters.neetcode;
+            // If any curated list filter is active, only show questions from that list
+            if (activeListFilters.length > 0) {
+                const isAnyListMatch = activeListFilters.some(key => (q as any)[key] === true);
+                if (!isAnyListMatch) return false;
+
+                // SPECIAL RULE: If Top 100 is selected, only show questions with count >= 2
+                if (filters.top100 === true && (q.count || 0) < 2) return false;
+            }
+            // By default, showing all questions (removed old count >= 2 default behavior)
 
             const matchesCompany = filters.companies.length === 0 || (q.companyTags && q.companyTags.some(c => filters.companies.includes(c)));
 
-            return matchesSearch && matchesPattern && matchesDifficulty && matchesBlind75 && matchesNeetcode && matchesCompany;
+            return matchesSearch && matchesPattern && matchesDifficulty && matchesCompany;
         });
     }, [allQuestions, filters]);
 
@@ -43,6 +58,7 @@ export default function TopicClient({ topic }: TopicClientProps) {
 
     return (
         <main className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 min-h-screen bg-slate-50/20 dark:bg-slate-950/20 transition-colors duration-500">
+
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div className="space-y-3 flex-1">
                     <div className="flex items-center justify-between">
@@ -81,6 +97,7 @@ export default function TopicClient({ topic }: TopicClientProps) {
                     </div>
                 </div>
             </div>
+            <CheatSheet topic={topic} />
 
             <FilterSection />
 
@@ -95,6 +112,27 @@ export default function TopicClient({ topic }: TopicClientProps) {
                 </div>
                 <QuestionTable questions={filteredQuestions} />
             </div>
+
+            <div className="pt-12 pb-8 border-t border-slate-200 dark:border-slate-800">
+                <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md group">
+                    <div className="space-y-1 text-center md:text-left">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-white">Ready for more?</h3>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Continue your journey with the next pattern.</p>
+                    </div>
+
+                    <Link
+                        href={`/topics/${topic === 'arrays' ? 'strings' : topic === 'strings' ? 'dp' : 'arrays'}`}
+                        className="flex items-center gap-3 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all hover:scale-105 shadow-lg shadow-blue-500/25 group/btn"
+                    >
+                        Next Topic: {topic === 'arrays' ? 'Strings' : topic === 'strings' ? 'Dynamic Programming' : 'Arrays'}
+                        <ArrowRight size={20} className="group-hover/btn:translate-x-1 transition-transform" />
+                    </Link>
+                </div>
+            </div>
+
+            <Footer />
         </main>
+
+
     );
 }

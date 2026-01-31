@@ -64,8 +64,8 @@ export default function FilterSection() {
                                 key={p}
                                 variant={filters.patterns.includes(p) ? "default" : "outline"}
                                 className={`cursor-pointer transition-all hover:scale-105 px-3 py-1 font-medium ${filters.patterns.includes(p)
-                                        ? "bg-blue-600 text-white border-blue-600"
-                                        : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700"
+                                    ? "bg-blue-600 text-white border-blue-600"
+                                    : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-blue-300 dark:hover:border-blue-700"
                                     }`}
                                 onClick={() => toggleFilter("patterns", p)}
                             >
@@ -87,10 +87,10 @@ export default function FilterSection() {
                                         size="sm"
                                         variant={filters.difficulties.includes(d) ? "default" : "outline"}
                                         className={`capitalize rounded-lg px-4 h-9 font-medium transition-all ${filters.difficulties.includes(d)
-                                                ? d === 'easy' ? 'bg-emerald-600 hover:bg-emerald-700 border-emerald-600' :
-                                                    d === 'medium' ? 'bg-amber-600 hover:bg-amber-700 border-amber-600' :
-                                                        'bg-rose-600 hover:bg-rose-700 border-rose-600'
-                                                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                            ? d === 'easy' ? 'bg-emerald-600 hover:bg-emerald-700 border-emerald-600' :
+                                                d === 'medium' ? 'bg-amber-600 hover:bg-amber-700 border-amber-600' :
+                                                    'bg-rose-600 hover:bg-rose-700 border-rose-600'
+                                            : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800"
                                             }`}
                                         onClick={() => toggleFilter("difficulties", d)}
                                     >
@@ -101,31 +101,56 @@ export default function FilterSection() {
                         </div>
 
                         {/* Flags */}
-                        <div className="space-y-3">
-                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Lists</h3>
-                            <div className="flex gap-2">
-                                <Button
-                                    size="sm"
-                                    variant={filters.blind75 ? "default" : "outline"}
-                                    className={`rounded-lg px-4 h-9 font-medium transition-all ${filters.blind75
-                                            ? "bg-indigo-600 border-indigo-600 text-white"
-                                            : "bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-900 hover:bg-indigo-50 dark:hover:bg-indigo-950"
-                                        }`}
-                                    onClick={() => setFilters({ blind75: filters.blind75 === true ? null : true })}
-                                >
-                                    Blind 75
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant={filters.neetcode ? "default" : "outline"}
-                                    className={`rounded-lg px-4 h-9 font-medium transition-all ${filters.neetcode
-                                            ? "bg-emerald-600 border-emerald-600 text-white"
-                                            : "bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-900 hover:bg-emerald-50 dark:hover:bg-indigo-950"
-                                        }`}
-                                    onClick={() => setFilters({ neetcode: filters.neetcode === true ? null : true })}
-                                >
-                                    NeetCode
-                                </Button>
+                        <div className="space-y-3 flex-1">
+                            <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">Curated Lists</h3>
+                            <div className="flex flex-wrap gap-2">
+                                {[
+                                    { id: "top100", label: "Top 100" },
+                                    { id: "blind75", label: "Blind 75" },
+                                    { id: "neetcode", label: "NeetCode" },
+                                    { id: "lovebabbar", label: "Love Babbar" },
+                                    { id: "striver", label: "Striver" },
+                                    { id: "grind75", label: "Grind 75" },
+                                    { id: "apnaCollege", label: "Apna College" },
+                                    { id: "algoPrep", label: "AlgoPrep" },
+                                    { id: "arshDSASheet", label: "Arsh DSA" },
+                                    { id: "algoMaster", label: "AlgoMaster" },
+                                    { id: "instabyte", label: "InstaByte" },
+                                ].map((list) => {
+                                    const isActive = filters[list.id as keyof typeof filters] === true;
+                                    return (
+                                        <Button
+                                            key={list.id}
+                                            size="sm"
+                                            variant={isActive ? "default" : "outline"}
+                                            className={`rounded-xl px-4 h-9 text-xs font-bold transition-all duration-300 ${isActive
+                                                ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/20 scale-105"
+                                                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-blue-400 dark:hover:border-blue-600 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50/50 dark:hover:bg-blue-900/10"
+                                                }`}
+                                            onClick={() => {
+                                                const isCurrentlyActive = isActive;
+                                                // Reset all list filters first
+                                                const resetFilters: any = {
+                                                    top100: null,
+                                                    blind75: null,
+                                                    neetcode: null,
+                                                    lovebabbar: null,
+                                                    striver: null,
+                                                    grind75: null,
+                                                    apnaCollege: null,
+                                                    algoPrep: null,
+                                                    arshDSASheet: null,
+                                                    algoMaster: null,
+                                                    instabyte: null
+                                                };
+                                                // Then set the clicked one
+                                                setFilters({ ...resetFilters, [list.id]: isCurrentlyActive ? null : true });
+                                            }}
+                                        >
+                                            {list.label}
+                                        </Button>
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>
@@ -140,8 +165,8 @@ export default function FilterSection() {
                                         key={c}
                                         variant={filters.companies.includes(c) ? "default" : "outline"}
                                         className={`cursor-pointer transition-all text-[10px] ${filters.companies.includes(c)
-                                                ? "bg-slate-800 dark:bg-slate-200 border-slate-800 dark:border-slate-200 dark:text-slate-900 text-white"
-                                                : "bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-800"
+                                            ? "bg-slate-800 dark:bg-slate-200 border-slate-800 dark:border-slate-200 dark:text-slate-900 text-white"
+                                            : "bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-800"
                                             }`}
                                         onClick={() => toggleFilter("companies", c)}
                                     >
