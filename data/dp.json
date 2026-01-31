@@ -1,1 +1,236 @@
-[]
+[
+    {
+        "title": "Climbing Stairs",
+        "url": "https://leetcode.com/problems/climbing-stairs/",
+        "difficulty": "Easy",
+        "tag": "Dynamic Programming",
+        "pattern": [
+            "Dynamic Programming"
+        ],
+        "revision": false,
+        "solved": false,
+        "top100": true,
+        "lovebabbar": false,
+        "striver": false,
+        "neetcode": true,
+        "blind75": true,
+        "grind75": true,
+        "interviewMemoryTrick": "",
+        "notes": "",
+        "videoSolution": "",
+        "textSolution": ""
+    },
+    {
+        "title": "Coin Change",
+        "url": "https://leetcode.com/problems/coin-change/",
+        "difficulty": "Medium",
+        "tag": "Dynamic Programming",
+        "pattern": [
+            "Dynamic Programming",
+            "BFS"
+        ],
+        "revision": false,
+        "solved": false,
+        "top100": true,
+        "lovebabbar": false,
+        "striver": false,
+        "neetcode": true,
+        "blind75": true,
+        "grind75": true,
+        "interviewMemoryTrick": "",
+        "notes": "",
+        "videoSolution": "",
+        "textSolution": ""
+    },
+    {
+        "title": "Longest Increasing Subsequence",
+        "url": "https://leetcode.com/problems/longest-increasing-subsequence/",
+        "difficulty": "Medium",
+        "tag": "Dynamic Programming",
+        "pattern": [
+            "Dynamic Programming"
+        ],
+        "revision": false,
+        "solved": false,
+        "top100": true,
+        "lovebabbar": false,
+        "striver": false,
+        "neetcode": true,
+        "blind75": true,
+        "grind75": true,
+        "interviewMemoryTrick": "",
+        "notes": "",
+        "videoSolution": "",
+        "textSolution": ""
+    },
+    {
+        "title": "Longest Common Subsequence",
+        "url": "https://leetcode.com/problems/longest-common-subsequence/",
+        "difficulty": "Medium",
+        "tag": "Dynamic Programming",
+        "pattern": [
+            "Dynamic Programming"
+        ],
+        "revision": false,
+        "solved": false,
+        "top100": false,
+        "lovebabbar": false,
+        "striver": false,
+        "neetcode": true,
+        "blind75": true,
+        "grind75": false,
+        "interviewMemoryTrick": "",
+        "notes": "",
+        "videoSolution": "",
+        "textSolution": ""
+    },
+    {
+        "title": "Word Break",
+        "url": "https://leetcode.com/problems/word-break/",
+        "difficulty": "Medium",
+        "tag": "Dynamic Programming",
+        "pattern": [
+            "Dynamic Programming",
+            "Trie"
+        ],
+        "revision": false,
+        "solved": false,
+        "top100": true,
+        "lovebabbar": false,
+        "striver": false,
+        "neetcode": true,
+        "blind75": true,
+        "grind75": true,
+        "interviewMemoryTrick": "",
+        "notes": "",
+        "videoSolution": "",
+        "textSolution": ""
+    },
+    {
+        "title": "Combination Sum",
+        "url": "https://leetcode.com/problems/combination-sum/",
+        "difficulty": "Medium",
+        "tag": "Dynamic Programming",
+        "pattern": [
+            "Backtracking"
+        ],
+        "revision": false,
+        "solved": false,
+        "top100": true,
+        "lovebabbar": false,
+        "striver": false,
+        "neetcode": true,
+        "blind75": true,
+        "grind75": true,
+        "interviewMemoryTrick": "",
+        "notes": "",
+        "videoSolution": "",
+        "textSolution": ""
+    },
+    {
+        "title": "House Robber",
+        "url": "https://leetcode.com/problems/house-robber/",
+        "difficulty": "Medium",
+        "tag": "Dynamic Programming",
+        "pattern": [
+            "Dynamic Programming"
+        ],
+        "revision": false,
+        "solved": false,
+        "top100": true,
+        "lovebabbar": false,
+        "striver": false,
+        "neetcode": true,
+        "blind75": true,
+        "grind75": true,
+        "interviewMemoryTrick": "",
+        "notes": "",
+        "videoSolution": "",
+        "textSolution": ""
+    },
+    {
+        "title": "House Robber II",
+        "url": "https://leetcode.com/problems/house-robber-ii/",
+        "difficulty": "Medium",
+        "tag": "Dynamic Programming",
+        "pattern": [
+            "Dynamic Programming"
+        ],
+        "revision": false,
+        "solved": false,
+        "top100": false,
+        "lovebabbar": false,
+        "striver": false,
+        "neetcode": true,
+        "blind75": true,
+        "grind75": false,
+        "interviewMemoryTrick": "",
+        "notes": "",
+        "videoSolution": "",
+        "textSolution": ""
+    },
+    {
+        "title": "Decode Ways",
+        "url": "https://leetcode.com/problems/decode-ways/",
+        "difficulty": "Medium",
+        "tag": "Dynamic Programming",
+        "pattern": [
+            "Dynamic Programming"
+        ],
+        "revision": false,
+        "solved": false,
+        "top100": false,
+        "lovebabbar": false,
+        "striver": false,
+        "neetcode": true,
+        "blind75": true,
+        "grind75": true,
+        "interviewMemoryTrick": "",
+        "notes": "",
+        "videoSolution": "",
+        "textSolution": ""
+    },
+    {
+        "title": "Unique Paths",
+        "url": "https://leetcode.com/problems/unique-paths/",
+        "difficulty": "Medium",
+        "tag": "Dynamic Programming",
+        "pattern": [
+            "Dynamic Programming"
+        ],
+        "revision": false,
+        "solved": false,
+        "top100": true,
+        "lovebabbar": false,
+        "striver": false,
+        "neetcode": true,
+        "blind75": true,
+        "grind75": true,
+        "interviewMemoryTrick": "",
+        "notes": "",
+        "videoSolution": "",
+        "textSolution": ""
+    },
+    {
+        "title": "Jump Game",
+        "url": "https://leetcode.com/problems/jump-game/",
+        "difficulty": "Medium",
+        "tag": "Dynamic Programming",
+        "pattern": [
+            "Greedy",
+            "Dynamic Programming"
+        ],
+        "revision": false,
+        "solved": false,
+        "top100": true,
+        "lovebabbar": false,
+        "striver": false,
+        "neetcode": true,
+        "blind75": true,
+        "grind75": true,
+        "interviewMemoryTrick": "",
+        "notes": "",
+        "videoSolution": "",
+        "textSolution": ""
+    }
+]

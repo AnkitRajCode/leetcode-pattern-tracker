@@ -55,11 +55,6 @@ export default function QuestionRow({
                         {question.title}
                         <ExternalLink size={14} className="opacity-0 group-hover/link:opacity-100 transition-opacity text-slate-400 dark:text-slate-500" />
                     </a>
-                    {question.blind75 && (
-                        <Badge variant="outline" className="text-[10px] uppercase tracking-wider bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-500/20 py-0 h-5">
-                            Blind75
-                        </Badge>
-                    )}
                 </div>
             </td>
 
