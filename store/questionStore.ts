@@ -41,6 +41,7 @@ type Store = {
     toggleSolved: (title: string) => void;
     toggleRevision: (title: string) => void;
     setFilters: (filters: Partial<FilterState>) => void;
+    setProgress: (progress: Record<string, { solved: boolean; revision: boolean }>) => void;
     clearFilters: () => void;
 };
 
@@ -101,6 +102,9 @@ export const useQuestionStore = create<Store>()(
                 set((state) => ({
                     filters: { ...state.filters, ...newFilters },
                 })),
+
+            setProgress: (progress) =>
+                set({ progress }),
 
             clearFilters: () =>
                 set({

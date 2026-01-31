@@ -4,11 +4,14 @@ import { useEffect, useMemo } from "react";
 import { useQuestionStore } from "@/store/questionStore";
 import QuestionTable from "@/components/table/QuestionTable";
 import FilterSection from "@/components/table/FilterSection";
-import { MoveLeft, ArrowRight } from "lucide-react";
+import { MoveLeft, ArrowRight, GraduationCap, LogIn } from "lucide-react";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import CheatSheet from "@/components/topic/CheatSheet";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/context/AuthContext";
+import UserNav from "@/components/UserNav";
+import { Button } from "@/components/ui/button";
 
 interface TopicClientProps {
     topic: string;
@@ -19,6 +22,7 @@ export default function TopicClient({ topic }: TopicClientProps) {
     const loadTopic = useQuestionStore((s) => s.loadTopic);
     const filters = useQuestionStore((s) => s.filters);
     const progress = useQuestionStore((s) => s.progress);
+    const { user, loading, signInWithGoogle } = useAuth();
 
     useEffect(() => {
         loadTopic(topic);
@@ -61,6 +65,43 @@ export default function TopicClient({ topic }: TopicClientProps) {
         return allQuestions.filter(q => progress[q.title]?.solved).length;
     }, [allQuestions, progress]);
 
+    if (!user && !loading) {
+        return (
+            <main className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 min-h-screen bg-slate-50/20 dark:bg-slate-950/20 flex flex-col items-center justify-center">
+                <div className="flex justify-end items-center gap-4 w-full max-w-5xl mb-12">
+                    <ThemeToggle />
+                </div>
+                <div className="bg-white dark:bg-slate-900 p-12 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-2xl text-center space-y-8 max-w-xl mx-auto animate-in fade-in slide-in-from-bottom-8 duration-700">
+                    <div className="w-20 h-20 bg-blue-100 dark:bg-blue-900/30 rounded-3xl flex items-center justify-center mx-auto mb-6 text-blue-600 dark:text-blue-400">
+                        <GraduationCap size={40} />
+                    </div>
+                    <div className="space-y-4">
+                        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                            Access <span className="text-blue-600">Restricted</span>
+                        </h1>
+                        <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                            Sign in with Google to access topic-specific patterns, track your progress, and synchronize data across your devices.
+                        </p>
+                    </div>
+
+                    <Button
+                        onClick={signInWithGoogle}
+                        size="lg"
+                        className="w-full h-14 rounded-2xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg gap-3 shadow-xl shadow-blue-500/20 hover:scale-[1.02] transition-all"
+                    >
+                        <LogIn size={20} />
+                        Continue with Google
+                    </Button>
+
+                    <Link href="/" className="inline-block text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors text-sm font-bold">
+                        ← Back to Home
+                    </Link>
+                </div>
+                <Footer />
+            </main>
+        );
+    }
+
     return (
         <main className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 min-h-screen bg-slate-50/20 dark:bg-slate-950/20 transition-colors duration-500">
 
@@ -71,7 +112,8 @@ export default function TopicClient({ topic }: TopicClientProps) {
                             <MoveLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
                             Back to Topics
                         </Link>
-                        <div className="md:hidden">
+                        <div className="flex items-center gap-3 md:hidden">
+                            <UserNav />
                             <ThemeToggle />
                         </div>
                     </div>
@@ -81,7 +123,8 @@ export default function TopicClient({ topic }: TopicClientProps) {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    <div className="hidden md:block">
+                    <div className="hidden md:flex items-center gap-4">
+                        <UserNav />
                         <ThemeToggle />
                     </div>
                     <div className="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm animate-in fade-in zoom-in duration-700 min-w-[200px]">

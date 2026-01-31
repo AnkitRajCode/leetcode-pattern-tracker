@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BookOpen, Code2, Cpu, GraduationCap } from "lucide-react";
+import UserNav from "@/components/UserNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "LeetCode Pattern Tracker - Home",
@@ -18,7 +18,8 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 via-white to-white dark:from-slate-900 dark:via-slate-950 dark:to-slate-950 p-6 md:p-12 lg:p-24 transition-colors duration-500">
       <div className="max-w-5xl mx-auto space-y-12 text-slate-900 dark:text-white">
-        <div className="flex justify-end">
+        <div className="flex justify-end items-center gap-4">
+          <UserNav />
           <ThemeToggle />
         </div>
         <div className="space-y-4 text-center">
