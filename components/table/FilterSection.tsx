@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Search, X, Filter } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 export default function FilterSection() {
     const allQuestions = useQuestionStore((s) => s.allQuestions);
@@ -31,13 +32,44 @@ export default function FilterSection() {
         filters.difficulties.length > 0 ||
         filters.blind75 !== null ||
         filters.neetcode !== null ||
+        filters.leetcode !== null ||
+        filters.geeksforgeeks !== null ||
         filters.companies.length > 0;
 
     return (
         <div className="space-y-6 mb-8 bg-slate-50/50 dark:bg-slate-900/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500 transition-colors">
-            <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold mb-4">
-                <Filter size={18} className="text-blue-600" />
-                Advanced Filters
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                <div className="flex items-center gap-2 text-slate-900 dark:text-white font-bold">
+                    <Filter size={18} className="text-blue-600" />
+                    Advanced Filters
+                </div>
+
+                <div className="flex gap-2">
+                    <Button
+                        size="sm"
+                        variant={filters.leetcode ? "default" : "outline"}
+                        onClick={() => setFilters({ leetcode: filters.leetcode ? null : true, geeksforgeeks: null })}
+                        className={`h-8 gap-2 rounded-lg transition-all ${filters.leetcode
+                                ? "bg-[#FFA116] hover:bg-[#E38E11] border-[#FFA116] text-white"
+                                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-[#FFA116] hover:text-[#FFA116]"
+                            }`}
+                    >
+                        <Image src="/icon/leetcode.png" alt="LeetCodeIcon" width={20} height={20} />
+                        LeetCode
+                    </Button>
+                    <Button
+                        size="sm"
+                        variant={filters.geeksforgeeks ? "default" : "outline"}
+                        onClick={() => setFilters({ geeksforgeeks: filters.geeksforgeeks ? null : true, leetcode: null })}
+                        className={`h-8 gap-2 rounded-lg transition-all ${filters.geeksforgeeks
+                                ? "bg-[#2F8D46] hover:bg-[#267339] border-[#2F8D46] text-white"
+                                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-[#2F8D46] hover:text-[#2F8D46]"
+                            }`}
+                    >
+                        <Image src="/icon/geeksforgeeks.png" alt="GeeksForGeeksIcon" width={20} height={20} />
+                        GeeksForGeeks
+                    </Button>
+                </div>
             </div>
 
             {/* Search Bar */}

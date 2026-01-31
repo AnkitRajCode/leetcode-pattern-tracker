@@ -44,6 +44,11 @@ export default function TopicClient({ topic }: TopicClientProps) {
                 // SPECIAL RULE: If Top 100 is selected, only show questions with count >= 2
                 if (filters.top100 === true && (q.count || 0) < 2) return false;
             }
+
+            // Platform Filters
+            if (filters.leetcode === true && q.leetcode !== true) return false;
+            if (filters.geeksforgeeks === true && q.geeksforgeeks !== true) return false;
+
             // By default, showing all questions (removed old count >= 2 default behavior)
 
             const matchesCompany = filters.companies.length === 0 || (q.companyTags && q.companyTags.some(c => filters.companies.includes(c)));

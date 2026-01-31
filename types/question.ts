@@ -17,6 +17,9 @@ export type Question = {
     arshDSASheet?: boolean;
     algoMaster?: boolean;
     instabyte?: boolean;
+    leetcode?: boolean;
+    geeksforgeeks?: boolean;
+    interviewbit?: boolean;
     count?: number;
     interviewMemoryTrick?: string;
     companyTags?: string[];

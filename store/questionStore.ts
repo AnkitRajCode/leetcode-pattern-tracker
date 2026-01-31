@@ -26,6 +26,9 @@ export type FilterState = {
     arshDSASheet: boolean | null;
     algoMaster: boolean | null;
     instabyte: boolean | null;
+    leetcode: boolean | null;
+    geeksforgeeks: boolean | null;
+    interviewbit: boolean | null;
     companies: string[];
     searchQuery: string;
 };
@@ -60,6 +63,9 @@ export const useQuestionStore = create<Store>()(
                 arshDSASheet: null,
                 algoMaster: null,
                 instabyte: null,
+                leetcode: null,
+                geeksforgeeks: null,
+                interviewbit: null,
                 companies: [],
                 searchQuery: "",
             },
@@ -112,6 +118,9 @@ export const useQuestionStore = create<Store>()(
                         arshDSASheet: null,
                         algoMaster: null,
                         instabyte: null,
+                        leetcode: null,
+                        geeksforgeeks: null,
+                        interviewbit: null,
                         companies: [],
                         searchQuery: "",
                     },
