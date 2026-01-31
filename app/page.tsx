@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { BookOpen, Code2, Cpu, GraduationCap } from "lucide-react";
 import UserNav from "@/components/UserNav";
