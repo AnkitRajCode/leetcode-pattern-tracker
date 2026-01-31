@@ -63,7 +63,7 @@ export default function SolutionDrawer({
                                         Memory Trick
                                     </div>
                                     <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed italic">
-                                        "{question.interviewMemoryTrick}"
+                                        {question.interviewMemoryTrick}
                                     </p>
                                 </div>
                             )}

@@ -213,7 +213,6 @@
         "videoSolution": "https://www.youtube.com/results?search_query=Best+Time+to+Buy+and+Sell+Stock+neetcode",
         "textSolution": ""
     },
-    
     {
         "title": "Find if array is subset of another array",
         "url": "https://www.geeksforgeeks.org/find-whether-an-array-is-subset-of-another-array-set-1/",
@@ -1502,6 +1501,36 @@
         "interviewMemoryTrick": "Check rows, columns, and 3x3 boxes",
         "notes": "",
         "videoSolution": "https://www.youtube.com/results?search_query=Valid+Sudoku+neetcode",
+        "textSolution": ""
+    },
+    {
+        "title": "Container With Most Water",
+        "url": "https://leetcode.com/problems/container-with-most-water/",
+        "difficulty": "medium",
+        "tag": "Array",
+        "pattern": [
+            "Two Pointers"
+        ],
+        "revision": false,
+        "solved": false,
+        "leetcode": true,
+        "geeksforgeeks": true,
+        "interviewbit": true,
+        "count": 8,
+        "top100": true,
+        "lovebabbar": false,
+        "striver": true,
+        "neetcode": true,
+        "blind75": true,
+        "grind75": true,
+        "apnaCollege": true,
+        "algoPrep": true,
+        "arshDSASheet": true,
+        "algoMaster": false,
+        "instabyte": false,
+        "interviewMemoryTrick": "Move pointer from shorter height",
+        "notes": "",
+        "videoSolution": "https://www.youtube.com/results?search_query=Container+With+Most+Water+neetcode",
         "textSolution": ""
     },
     {
