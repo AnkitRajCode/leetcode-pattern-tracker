@@ -5,11 +5,17 @@ import { Question } from "@/types/question";
 import arrays from "@/data/arrays.json";
 import strings from "@/data/strings.json";
 import dp from "@/data/dp.json";
+import linkedlist from "@/data/linkedlist.json";
+import graph from "@/data/graph.json";
+import tree from "@/data/tree.json";
 
 const topicMap: Record<string, Question[]> = {
     arrays: arrays as Question[],
     strings: strings as Question[],
-    dp: dp as Question[]
+    dp: dp as Question[],
+    linkedlist: linkedlist as Question[],
+    graph: graph as Question[],
+    tree: tree as Question[]
 };
 
 export type FilterState = {

@@ -84,6 +84,44 @@ const cheatSheetData: Record<string, CheatSheetCard[]> = {
                 { label: "Tabulation", desc: "Bottom-up approach" }
             ]
         }
+    ],
+    linkedlist: [
+        {
+            title: "Fundamentals",
+            icon: <GitBranch size={18} />,
+            color: "blue",
+            items: [
+                { label: "Traversal", desc: "Iterate through the list, understand the node structure" },
+                { label: "Insertion/Deletion", desc: "At beginning, end, or at a specific position" }
+            ]
+        },
+        {
+            title: "Techniques",
+            icon: <MousePointer2 size={18} />,
+            color: "emerald",
+            items: [
+                { label: "Reversal", desc: "In-place reversal, recursive and iterative approaches" },
+                { label: "Cycle Detection", desc: "Floyd's Tortoise and Hare algorithm" }
+            ]
+        },
+        {
+            title: "Key Patterns",
+            icon: <Search size={18} />,
+            color: "indigo",
+            items: [
+                { label: "Fast & Slow Pointers", desc: "Finding middle, cycle detection, or kth from end" },
+                { label: "Intersection Point", desc: "Length difference or hashing approach" }
+            ]
+        },
+        {
+            title: "Complex Structures",
+            icon: <Layers size={18} />,
+            color: "rose",
+            items: [
+                { label: "Doubly Linked List", desc: "Nodes with both next and previous pointers" },
+                { label: "Flattening Lists", desc: "Merging multi-level lists into a single list" }
+            ]
+        }
     ]
 };
 

@@ -49,9 +49,9 @@ export default function FilterSection() {
                         size="sm"
                         variant={filters.leetcode ? "default" : "outline"}
                         onClick={() => setFilters({ leetcode: filters.leetcode ? null : true, geeksforgeeks: null })}
-                        className={`h-8 gap-2 rounded-lg transition-all ${filters.leetcode
-                                ? "bg-[#FFA116] hover:bg-[#E38E11] border-[#FFA116] text-white"
-                                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-[#FFA116] hover:text-[#FFA116]"
+                        className={`h-8 gap-2 rounded-lg cursor-pointer transition-all ${filters.leetcode
+                            ? "bg-[#FFA116] hover:bg-[#E38E11] border-[#FFA116] text-white"
+                            : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-[#FFA116] hover:text-[#FFA116]"
                             }`}
                     >
                         <Image src="/icon/leetcode.png" alt="LeetCodeIcon" width={20} height={20} />
@@ -61,9 +61,9 @@ export default function FilterSection() {
                         size="sm"
                         variant={filters.geeksforgeeks ? "default" : "outline"}
                         onClick={() => setFilters({ geeksforgeeks: filters.geeksforgeeks ? null : true, leetcode: null })}
-                        className={`h-8 gap-2 rounded-lg transition-all ${filters.geeksforgeeks
-                                ? "bg-[#2F8D46] hover:bg-[#267339] border-[#2F8D46] text-white"
-                                : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-[#2F8D46] hover:text-[#2F8D46]"
+                        className={`h-8 gap-2 rounded-lg cursor-pointer transition-all ${filters.geeksforgeeks
+                            ? "bg-[#2F8D46] hover:bg-[#267339] border-[#2F8D46] text-white"
+                            : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-[#2F8D46] hover:text-[#2F8D46]"
                             }`}
                     >
                         <Image src="/icon/geeksforgeeks.png" alt="GeeksForGeeksIcon" width={20} height={20} />
