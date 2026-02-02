@@ -79,3 +79,46 @@ YouTube Playlist: [Watch here](https://www.youtube.com/watch?v=0Rwb4Xmlcwc&list=
 
 ### 
 - [SDE Sheets - bio.link](https://sdesheets.bio.link/)
+
+## my refrence
+DSA Sheet by Arsh (45-60 Days Plan)
+https://docs.google.com/spreadsheets/d/1MGVBJ8HkRbCnU6EQASjJKCqQE8BWng4qgL0n3vCVOxE/edit?gid=0#gid=0
+
+
+DSA by Shradha Ma'am
+https://docs.google.com/spreadsheets/d/1hXserPuxVoWMG9Hs7y8wVdRCJTcj3xMBAEYUOXQ5Xag/edit?gid=0#gid=0
+
+DSA Sheet by Love Babbar
+https://www.geeksforgeeks.org/dsa/dsa-sheet-by-love-babbar/#arrays
+
+
+neetcode 150
+https://docs.google.com/spreadsheets/d/1Og4eTkHr4hzELXcM3TSUU9jXJoo2nnjZAtV7XypWTRI/edit?gid=0#gid=0
+
+https://neetcode.io/practice/practice/neetcode150
+
+algo master
+https://algomaster.io/learn/dsa/course-roadmap
+
+striver
+https://takeuforward.org/dsa/strivers-sde-sheet-top-coding-interview-problems
+
+
+not include
+Copy of Aryan DSA-169 Series
+https://docs.google.com/spreadsheets/d/1RfA06xazIWlBKr5tJrgN5rGdbaH_Oxs_VSyddjgOyuU/edit?gid=0#gid=0
+
+
+AlgoPrep's 151 Problems Sheet
+https://docs.google.com/spreadsheets/d/1kyHfGGaLTzWspcqMUUS5Httmip7t8LJB0P-uPrRLGos/edit?gid=0#gid=0
+
+
+Instabyte Interview Master 100
+https://instabyte.io/p/interview-master-100
+
+Instabyte DSA Master
+https://instabyte.io/p/dsa-master
+
+
+FAANG Coding Interview Questions
+https://github.com/ombharatiya/FAANG-Coding-Interview-Questions
