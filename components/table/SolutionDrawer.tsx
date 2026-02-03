@@ -62,7 +62,7 @@ export default function SolutionDrawer({
                                         <Brain size={16} />
                                         Memory Trick
                                     </div>
-                                    <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed italic">
+                                    <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed italic whitespace-pre-line">
                                         {question.interviewMemoryTrick}
                                     </p>
                                 </div>
