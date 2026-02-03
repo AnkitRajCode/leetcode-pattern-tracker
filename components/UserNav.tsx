@@ -2,7 +2,8 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { LogIn, LogOut, User as UserIcon } from "lucide-react";
+import { LogIn, LogOut, User as UserIcon, Layout } from "lucide-react";
+import Link from "next/link";
 import Image from "next/image";
 
 export default function UserNav() {
@@ -27,6 +28,7 @@ export default function UserNav() {
 
     return (
         <div className="flex items-center gap-4">
+                <Link href="/dashboard">
             <div className="flex items-center gap-3 px-3 py-1.5 rounded-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
                 {user.photoURL ? (
                     <Image
@@ -43,11 +45,13 @@ export default function UserNav() {
                     {user.displayName?.split(' ')[0]}
                 </span>
             </div>
+                
+            </Link>
             <Button
                 onClick={logout}
                 variant="ghost"
                 size="icon"
-                className="rounded-full text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-colors"
+                className="cursor-pointer rounded-full text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-colors"
                 title="Logout"
             >
                 <LogOut size={18} />

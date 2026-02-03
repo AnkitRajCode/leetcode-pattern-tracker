@@ -32,7 +32,8 @@ export default function QuestionRow({
                 <Checkbox
                     checked={isSolved}
                     onCheckedChange={() => toggleSolved(question.title)}
-                    className="border-slate-300 dark:border-slate-700 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500"
+                    disabled
+                    className="border-slate-300 dark:border-slate-700 data-[state=checked]:bg-emerald-500 data-[state=checked]:border-emerald-500 opacity-100 cursor-default"
                 />
             </td>
 

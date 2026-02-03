@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BookOpen, Code2, Cpu, GraduationCap, Link2 } from "lucide-react";
+import { BookOpen, Code2, Cpu, GraduationCap, Link2, Github, Twitter, Linkedin, Globe } from "lucide-react";
 import UserNav from "@/components/UserNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -36,6 +36,7 @@ export default function Home() {
             Stop memorizing solutions. Start mastering patterns. Your journey to top-tier engineering roles begins here.
           </p>
         </div>
+
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {topics.map((t) => (
@@ -82,7 +83,39 @@ export default function Home() {
             </div>
           </div>
           <div className="text-slate-400 dark:text-slate-500 text-sm font-medium">
-            © 2026 PatternTracker. All rights reserved.
+            <div className="flex flex-col items-center md:items-end gap-4">
+              <div className="flex items-center gap-4">
+                {[
+                  { icon: <Globe size={20} />, href: "https://ankitraj.pages.dev", label: "Portfolio" },
+                  { icon: <Github size={20} />, href: "https://github.com/AnkitRajCode", label: "GitHub" },
+                  { icon: <Twitter size={20} />, href: "https://twitter.com/AnkitRajCode", label: "Twitter" },
+                  { icon: <Linkedin size={20} />, href: "https://linkedin.com/in/AnkitRajCode", label: "LinkedIn" }
+                ].map((social, idx) => (
+                  <a
+                    key={idx}
+                    href={social.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 dark:hover:text-white transition-all duration-300 hover:-translate-y-1 shadow-sm"
+                    aria-label={social.label}
+                  >
+                    {social.icon}
+                  </a>
+                ))}
+              </div>
+              <p className="text-xs font-bold text-slate-500 dark:text-slate-500 flex items-center gap-1.5">
+                Made by
+                <a
+                  href="https://ankitraj.pages.dev"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+                >
+                  AnkitRajCode
+                </a>
+              </p>
+            </div>
+            <span>© {new Date().getFullYear()}</span> PatternTracker. All rights reserved.
           </div>
         </div>
       </div>

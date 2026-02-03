@@ -37,6 +37,7 @@ export type FilterState = {
     interviewbit: boolean | null;
     companies: string[];
     searchQuery: string;
+    leetcodeUsername: string;
 };
 
 type Store = {
@@ -49,6 +50,8 @@ type Store = {
     setFilters: (filters: Partial<FilterState>) => void;
     setProgress: (progress: Record<string, { solved: boolean; revision: boolean }>) => void;
     clearFilters: () => void;
+    syncWithLeetcode: (uid: string) => Promise<void>;
+    setLeetcodeUsername: (username: string) => void;
 };
 
 export const useQuestionStore = create<Store>()(
@@ -75,6 +78,7 @@ export const useQuestionStore = create<Store>()(
                 interviewbit: null,
                 companies: [],
                 searchQuery: "",
+                leetcodeUsername: "",
             },
 
             loadTopic: (topic) =>
@@ -113,7 +117,7 @@ export const useQuestionStore = create<Store>()(
                 set({ progress }),
 
             clearFilters: () =>
-                set({
+                set((state) => ({
                     filters: {
                         patterns: [],
                         difficulties: [],
@@ -133,8 +137,49 @@ export const useQuestionStore = create<Store>()(
                         interviewbit: null,
                         companies: [],
                         searchQuery: "",
+                        leetcodeUsername: state.filters.leetcodeUsername,
                     },
-                }),
+                })),
+
+            setLeetcodeUsername: (username) =>
+                set((state) => ({
+                    filters: { ...state.filters, leetcodeUsername: username },
+                })),
+
+            syncWithLeetcode: async (uid) => {
+                const { filters, progress } = useQuestionStore.getState();
+                const username = filters.leetcodeUsername;
+
+                if (!username) return;
+
+                try {
+                    const response = await fetch("/api/leetcode/sync", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ username }),
+                    });
+
+                    if (!response.ok) throw new Error("Sync failed");
+
+                    const data = await response.json();
+                    const recentSubmissions = data.data.recentAcSubmissionList || [];
+                    const solvedTitles = recentSubmissions.map((s: any) => s.title);
+
+                    // Update progress state
+                    const newProgress = { ...progress };
+                    solvedTitles.forEach((title: string) => {
+                        newProgress[title] = {
+                            ...newProgress[title],
+                            solved: true,
+                        };
+                    });
+
+                    set({ progress: newProgress });
+                } catch (error) {
+                    console.error("Sync error:", error);
+                    throw error;
+                }
+            },
         }),
         {
             name: "leetcode-tracker-progress",
