@@ -95,7 +95,7 @@ export default function QuestionRow({
                     size="sm"
                     variant="ghost"
                     onClick={() => setDrawerOpen(true)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-500/20 hover:text-blue-700 dark:hover:text-blue-300 font-semibold h-8"
+                    className="opacity-0 cursor-pointer group-hover:opacity-100 transition-opacity bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-500/20 hover:text-blue-700 dark:hover:text-blue-300 font-semibold h-8"
                 >
                     Solution
                 </Button>

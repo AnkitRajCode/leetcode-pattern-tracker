@@ -107,7 +107,7 @@ const cheatSheetData: Record<string, CheatSheetCard[]> = {
         {
             title: "Key Patterns",
             icon: <Search size={18} />,
-            color: "indigo",
+            color: "gray",
             items: [
                 { label: "Fast & Slow Pointers", desc: "Finding middle, cycle detection, or kth from end" },
                 { label: "Intersection Point", desc: "Length difference or hashing approach" }
