@@ -20,7 +20,7 @@ export async function POST(request: Request) {
             `,
             variables: {
                 username: username,
-                limit: 20
+                limit: 100
             }
         };
 

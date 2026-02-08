@@ -17,22 +17,32 @@ export default function LeetcodeSync() {
 
     // Load saved username and history on mount
     useEffect(() => {
-        if (user) {
-            getLeetcodeUsername(user.uid).then(username => {
-                if (username) setLeetcodeUsername(username);
-            });
+        const fetchInitialData = async () => {
+            if (user) {
+                try {
+                    const username = await getLeetcodeUsername(user.uid);
+                    if (username) {
+                        setLeetcodeUsername(username);
+                        // Auto-sync after loading username
+                        handleSync();
+                    }
 
-            getSyncedQuestions(user.uid).then(savedTitles => {
-                if (savedTitles.length > 0) {
-                    const newProgress = { ...progress };
-                    savedTitles.forEach(title => {
-                        newProgress[title] = { ...newProgress[title], solved: true };
-                    });
-                    setProgress(newProgress);
+                    const savedTitles = await getSyncedQuestions(user.uid);
+                    if (savedTitles.length > 0) {
+                        const newProgress = { ...progress };
+                        savedTitles.forEach(title => {
+                            newProgress[title] = { ...newProgress[title], solved: true };
+                        });
+                        setProgress(newProgress);
+                    }
+                } catch (error) {
+                    console.error("Error loading initial sync data:", error);
                 }
-            });
-        }
-    }, [user]);
+            }
+        };
+
+        fetchInitialData();
+    }, [user?.uid]);
 
     const handleSync = async () => {
         if (!user || !filters.leetcodeUsername) return;
