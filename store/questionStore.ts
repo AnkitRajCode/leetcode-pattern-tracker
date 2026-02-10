@@ -153,6 +153,17 @@ export const useQuestionStore = create<Store>()(
                 if (!username) return;
 
                 try {
+                    // Build a slug → local title lookup from all topic questions
+                    const slugToTitle: Record<string, string> = {};
+                    Object.values(topicMap).forEach(questions => {
+                        questions.forEach(q => {
+                            const match = q.url.match(/leetcode\.com\/problems\/([^/]+)/);
+                            if (match) {
+                                slugToTitle[match[1]] = q.title;
+                            }
+                        });
+                    });
+
                     const response = await fetch("/api/leetcode/sync", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -163,7 +174,11 @@ export const useQuestionStore = create<Store>()(
 
                     const data = await response.json();
                     const recentSubmissions = data.data.recentAcSubmissionList || [];
-                    const solvedTitles = recentSubmissions.map((s: any) => s.title);
+
+                    // Match by URL slug instead of title for reliable matching
+                    const solvedTitles = recentSubmissions
+                        .map((s: any) => slugToTitle[s.titleSlug] || null)
+                        .filter(Boolean) as string[];
 
                     // Update progress state
                     const newProgress = { ...progress };
