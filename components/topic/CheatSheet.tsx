@@ -122,6 +122,44 @@ const cheatSheetData: Record<string, CheatSheetCard[]> = {
                 { label: "Flattening Lists", desc: "Merging multi-level lists into a single list" }
             ]
         }
+    ],
+    generic: [
+        {
+            title: "Two Pointers",
+            icon: <MousePointer2 size={18} />,
+            color: "blue",
+            items: [
+                { label: "Opposite Ends", desc: "Converge from both sides of sorted input" },
+                { label: "Same Direction", desc: "Fast & slow pointers for partitioning" }
+            ]
+        },
+        {
+            title: "Dynamic Programming",
+            icon: <Cpu size={18} />,
+            color: "emerald",
+            items: [
+                { label: "Fibonacci Pattern", desc: "Build from base cases with rolling variables" },
+                { label: "State Transition", desc: "Define recurrence, memo or tabulate" }
+            ]
+        },
+        {
+            title: "Greedy Strategies",
+            icon: <ArrowUpDown size={18} />,
+            color: "indigo",
+            items: [
+                { label: "Interval Scheduling", desc: "Sort by end time, pick non-overlapping" },
+                { label: "Optimal Substructure", desc: "Local best choice leads to global optimum" }
+            ]
+        },
+        {
+            title: "Bit Manipulation",
+            icon: <Hash size={18} />,
+            color: "rose",
+            items: [
+                { label: "XOR Tricks", desc: "Find unique elements, toggle bits" },
+                { label: "Bitmask DP", desc: "Subset enumeration with bitmasks" }
+            ]
+        }
     ]
 };
 

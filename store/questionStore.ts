@@ -8,6 +8,7 @@ import dp from "@/data/dp.json";
 import linkedlist from "@/data/linkedlist.json";
 import graph from "@/data/graph.json";
 import tree from "@/data/tree.json";
+import generic from "@/data/generic.json";
 
 const topicMap: Record<string, Question[]> = {
     arrays: arrays as Question[],
@@ -15,7 +16,8 @@ const topicMap: Record<string, Question[]> = {
     dp: dp as Question[],
     linkedlist: linkedlist as Question[],
     graph: graph as Question[],
-    tree: tree as Question[]
+    tree: tree as Question[],
+    generic: generic as Question[]
 };
 
 export type FilterState = {

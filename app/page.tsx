@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BookOpen, Code2, Cpu, GraduationCap, Link2, Github, Twitter, Linkedin, Globe } from "lucide-react";
+import { BookOpen, Code2, Cpu, GraduationCap, Link2, Layers, Github, Twitter, Linkedin, Globe } from "lucide-react";
 import UserNav from "@/components/UserNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -13,7 +13,8 @@ const topics = [
   { id: "arrays", name: "Arrays & Hashing", icon: <Code2 className="text-blue-500" />, description: "Master the foundation of DSA with pattern-based array problems." },
   { id: "strings", name: "String Manipulation", icon: <BookOpen className="text-emerald-500" />, description: "Efficient techniques for traversals, palindromes, and substrings." },
   { id: "linkedlist", name: "Linked Lists", icon: <Link2 className="text-amber-500" />, description: "Master pointer manipulation, reversals, and cycle detection." },
-  { id: "dp", name: "Dynamic Programming", icon: <Cpu className="text-rose-500" />, description: "Transition from recursion to optimized memoization and tabulations." }
+  { id: "dp", name: "Dynamic Programming", icon: <Cpu className="text-rose-500" />, description: "Transition from recursion to optimized memoization and tabulations." },
+  { id: "generic", name: "Generic", icon: <Layers className="text-violet-500" />, description: "Explore general-purpose patterns and mixed-topic problem-solving strategies." }
 ];
 
 export default function Home() {
