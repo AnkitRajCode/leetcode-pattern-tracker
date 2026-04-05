@@ -219,8 +219,24 @@ leetcode-pattern-tracker/
 
 ### System Design
 
+#### 📘 Courses & Roadmaps
 - [InterviewReady — System Design Course](https://interviewready.io/course-page/system-design-course)
 - [Complete System Design Roadmap — takeUforward](https://takeuforward.org/system-design/complete-system-design-roadmap-with-videos-for-sdes)
+- [AlgoMaster — System Design Course Introduction](https://algomaster.io/learn/system-design/course-introduction)
+
+#### 🔧 LLD Resources
+- [LLD Coding — Practice Low Level Design](https://www.lldcoding.com/)
+
+#### 📦 HLD / System Design Repositories
+- [HLD System Designs — Anshul619](https://github.com/Anshul619/HLD-System-Designs?tab=readme-ov-file)
+- [GitHub Topics — High Level Design](https://github.com/topics/high-level-design)
+- [System Design LLD & HLD — vivek-panchal](https://github.com/vivek-panchal/System-Design-LLD-HLD)
+- [SystemDesign Playbook — DesignNerds](https://github.com/DesignNerds/SystemDesign-Playbook)
+- [System Design Academy — systemdesign42](https://github.com/systemdesign42/system-design-academy?tab=readme-ov-file)
+- [Best System Design Resources — armankhondker](https://github.com/armankhondker/best-system-design-resources?tab=readme-ov-file)
+- [Awesome System Design Resources — ashishps1](https://github.com/ashishps1/awesome-system-design-resources?tab=readme-ov-file)
+
+#### 🧠 Deep Dives
 - [Introduction to NoSQL Databases](https://corewise.video/extraction/4fbc22d3-5e1c-4b8f-92d0-73976abda193)
 - [What is Consistent Hashing and Where is it Used?](https://corewise.video/extraction/ee7dd85a-8659-4036-98aa-52d4eeebd393)
 
