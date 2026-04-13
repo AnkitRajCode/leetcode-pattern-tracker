@@ -2,11 +2,15 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { LogIn, LogOut, User as UserIcon, Layout } from "lucide-react";
+import { LogIn, LogOut, User as UserIcon, ServerCog } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
-export default function UserNav() {
+interface UserNavProps {
+    onOpenSystemDesign?: () => void;
+}
+
+export default function UserNav({ onOpenSystemDesign }: UserNavProps) {
     const { user, signInWithGoogle, logout, loading } = useAuth();
 
     if (loading) {
@@ -28,25 +32,38 @@ export default function UserNav() {
 
     return (
         <div className="flex items-center gap-4">
-                <Link href="/dashboard">
-            <div className="flex items-center gap-3 px-3 py-1.5 rounded-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
-                {user.photoURL ? (
-                    <Image
-                        src={user.photoURL}
-                        alt={user.displayName || "User"}
-                        width={24}
-                        height={24}
-                        className="rounded-full ring-2 ring-blue-500/20"
-                    />
-                ) : (
-                    <UserIcon size={16} className="text-slate-500" />
-                )}
-                <span className="text-sm font-bold text-slate-700 dark:text-slate-300 hidden sm:block">
-                    {user.displayName?.split(' ')[0]}
-                </span>
-            </div>
-                
+            <Link href="/dashboard">
+                <div className="flex items-center gap-3 px-3 py-1.5 rounded-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                    {user.photoURL ? (
+                        <Image
+                            src={user.photoURL}
+                            alt={user.displayName || "User"}
+                            width={24}
+                            height={24}
+                            className="rounded-full ring-2 ring-blue-500/20"
+                        />
+                    ) : (
+                        <UserIcon size={16} className="text-slate-500" />
+                    )}
+                    <span className="text-sm font-bold text-slate-700 dark:text-slate-300 hidden sm:block">
+                        {user.displayName?.split(' ')[0]}
+                    </span>
+                </div>
             </Link>
+
+            {/* System Design Notes — only visible when signed in */}
+            {onOpenSystemDesign && (
+                <button
+                    id="system-design-btn"
+                    onClick={onOpenSystemDesign}
+                    title="System Design Notes"
+                    className="p-2.5 cursor-pointer rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-yellow-500 hover:text-white dark:hover:bg-yellow-500 dark:hover:text-white transition-all duration-300 hover:-translate-y-0.5 shadow-sm border border-slate-200 dark:border-slate-800"
+                    aria-label="Open System Design Notes"
+                >
+                    <ServerCog size={20} />
+                </button>
+            )}
+
             <Button
                 onClick={logout}
                 variant="ghost"
