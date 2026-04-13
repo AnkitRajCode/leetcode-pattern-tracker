@@ -1,13 +1,11 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
-import { BookOpen, Code2, Cpu, GraduationCap, Link2, Layers, Github, Twitter, Linkedin, Globe } from "lucide-react";
+import { BookOpen, Code2, Cpu, GraduationCap, Link2, Layers, Github, Twitter, Linkedin, Globe, ServerCog } from "lucide-react";
 import UserNav from "@/components/UserNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
-
-export const metadata: Metadata = {
-  title: "LeetCode Pattern Tracker - Home",
-  description: "Stop memorizing solutions. Start mastering patterns. The ultimate tracker for Blind 75, NeetCode, and pattern-based DSA interview preparation.",
-};
+import SystemDesignModal from "@/components/SystemDesignModal";
 
 const topics = [
   { id: "arrays", name: "Arrays & Hashing", icon: <Code2 className="text-blue-500" />, description: "Master the foundation of DSA with pattern-based array problems." },
@@ -18,13 +16,26 @@ const topics = [
 ];
 
 export default function Home() {
+  const [sdModalOpen, setSdModalOpen] = useState(false);
+
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 via-white to-white dark:from-slate-900 dark:via-slate-950 dark:to-slate-950 p-6 md:p-12 lg:p-24 transition-colors duration-500">
       <div className="max-w-5xl mx-auto space-y-12 text-slate-900 dark:text-white">
         <div className="flex justify-end items-center gap-4">
           <UserNav />
+          {/* System Design Icon */}
+          <button
+            id="system-design-btn"
+            onClick={() => setSdModalOpen(true)}
+            title="System Design Notes"
+            className="p-2.5 cursor-pointer rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-yellow-500 hover:text-white dark:hover:bg-yellow-500 dark:hover:text-white transition-all duration-300 hover:-translate-y-0.5 shadow-sm border border-slate-200 dark:border-slate-800"
+            aria-label="Open System Design Notes"
+          >
+            <ServerCog size={20} />
+          </button>
           <ThemeToggle />
         </div>
+        <SystemDesignModal isOpen={sdModalOpen} onClose={() => setSdModalOpen(false)} />
         <div className="space-y-4 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-widest mb-4">
             <GraduationCap size={14} />
