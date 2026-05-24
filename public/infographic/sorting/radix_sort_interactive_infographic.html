@@ -1,0 +1,163 @@
+<style>
+  :root {
+    --color-text-primary: #e2e8f0;
+    --color-text-secondary: #94a3b8;
+    --color-text-info: #93c5fd;
+    --color-text-success: #6ee7b7;
+    --color-background-secondary: #0f172a;
+    --color-background-info: #1e3a5f;
+    --color-background-success: #064e3b;
+    --color-border-secondary: #334155;
+    --border-radius-md: 8px;
+  }
+  html, body { margin:0; padding:0; background:#020617; overflow:hidden; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+  .cell { display:inline-flex; align-items:center; justify-content:center; min-width:36px; height:30px; border-radius:6px; font-size:12px; font-weight:500; margin:2px; padding:0 4px; transition:all 0.3s; }
+  .cell.highlight { background:#FAC775; color:#1e293b; box-shadow:0 0 0 2px #EF9F27; }
+  .cell.sorted { background:#5DCAA5; color:#1e293b; box-shadow:0 0 0 2px #0F6E56; }
+  .cell.normal { background:#334155; color:#e2e8f0; }
+  .cell.digit-hl { background:#AFA9EC; color:#1e293b; box-shadow:0 0 0 2px #534AB7; }
+  .bucket { display:inline-flex; flex-direction:column; align-items:center; min-width:36px; margin:3px; }
+  .bucket-label { font-size:9px; color:var(--color-text-secondary); margin-bottom:3px; }
+  .bucket-items { display:flex; flex-direction:column; gap:2px; min-height:30px; }
+  .bucket-item { width:36px; height:22px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:500; background:#7F77DD; color:#fff; }
+  .section { background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px; margin-bottom:10px; }
+  .section-label { font-size:10px; color:var(--color-text-secondary); margin-bottom:6px; font-weight:500; text-transform:uppercase; letter-spacing:0.5px; }
+  .btn { padding:6px 16px; border-radius:var(--border-radius-md); border:0.5px solid var(--color-border-secondary); background:transparent; color:var(--color-text-primary); cursor:pointer; font-size:13px; transition:background 0.15s; }
+  .btn:hover { background:var(--color-background-secondary); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn.primary { background:var(--color-background-info); color:var(--color-text-info); border-color:transparent; }
+  .legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .step-log { font-size:12px; color:var(--color-text-secondary); min-height:20px; transition:opacity 0.3s; }
+</style>
+
+<div style="padding:1.5rem 1rem 0">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px">
+    <div>
+      <span style="font-size:16px; font-weight:500; color:var(--color-text-primary)">Radix sort</span>
+      <span style="font-size:13px; color:var(--color-text-secondary); margin-left:8px">-sort digit by digit, LSD to MSD</span>
+    </div>
+    <span id="step-label" style="font-size:12px; color:var(--color-text-secondary)">Step 0</span>
+  </div>
+
+  <div style="display:flex; gap:14px; margin-bottom:14px; flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#AFA9EC"></span>Current digit</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#7F77DD"></span>In bucket</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#5DCAA5"></span>Sorted</span>
+  </div>
+
+  <div id="array-section" class="section"></div>
+  <div id="bucket-section" class="section" style="min-height:80px"></div>
+
+  <div id="step-log" class="step-log" style="margin-bottom:14px; text-align:center"></div>
+
+  <div style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap">
+    <div style="flex:1; min-width:100px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:3px">Digit place</div>
+      <div id="digit-label" style="font-size:15px; font-weight:500; color:var(--color-text-info)">1s</div>
+    </div>
+    <div style="flex:1; min-width:100px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:3px">Pass</div>
+      <div id="pass-label" style="font-size:15px; font-weight:500; color:var(--color-text-primary)">0 / 2</div>
+    </div>
+    <div style="flex:2; min-width:160px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:3px">Key insight</div>
+      <div style="font-size:12px; font-weight:500; color:var(--color-text-secondary)">O(d×(n+k)) -d digits, stable per-digit sort</div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+    <button class="btn primary" id="btn-step" onclick="stepOnce()">Step →</button>
+    <button class="btn" id="btn-auto" onclick="toggleAuto()">Auto play</button>
+    <button class="btn" id="btn-reset" onclick="init()">Reset</button>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:8px; font-size:12px; color:var(--color-text-secondary)">
+      Speed <input type="range" id="speed" min="100" max="900" value="400" step="100" style="width:80px" oninput="updateSpeed()">
+      <span id="speed-label">0.8×</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const VALS = [72, 38, 91, 55, 18, 67, 44];
+let allSteps, stepIdx, autoTimer, speedMs;
+
+function getDigit(num, place) { return Math.floor(num / place) % 10; }
+
+function buildSteps(input) {
+  const steps = [], a = [...input];
+  const max = Math.max(...a);
+  const numDigits = max.toString().length;
+  steps.push({type:'initial', arr:[...a], digitPlace:1, pass:0, numDigits});
+
+  let place = 1;
+  for (let d = 0; d < numDigits; d++) {
+    const buckets = Array.from({length:10}, ()=>[]);
+    steps.push({type:'pass-start', arr:[...a], digitPlace:place, pass:d+1, numDigits});
+    for (let i = 0; i < a.length; i++) {
+      const digit = getDigit(a[i], place);
+      buckets[digit].push(a[i]);
+      steps.push({type:'distribute', arr:[...a], idx:i, val:a[i], digit, buckets:buckets.map(b=>[...b]), digitPlace:place, pass:d+1, numDigits});
+    }
+    // Collect
+    let k = 0;
+    for (let b = 0; b < 10; b++) {
+      for (let j = 0; j < buckets[b].length; j++) {
+        a[k++] = buckets[b][j];
+      }
+    }
+    steps.push({type:'collect', arr:[...a], buckets:buckets.map(b=>[...b]), digitPlace:place, pass:d+1, numDigits});
+    place *= 10;
+  }
+  steps.push({type:'done', arr:[...a]});
+  return steps;
+}
+
+function renderArray(arr, highlightIdx, done) {
+  const sec = document.getElementById('array-section');
+  sec.innerHTML = '<div class="section-label">Array</div><div>' +
+    arr.map((v, i) => '<span class="cell ' + (done ? 'sorted' : (i === highlightIdx ? 'digit-hl' : 'normal')) + '">' + v + '</span>').join('') + '</div>';
+}
+
+function renderBuckets(buckets) {
+  const sec = document.getElementById('bucket-section');
+  if (!buckets) { sec.innerHTML = '<div class="section-label">Buckets (0-9)</div><div style="font-size:12px;color:var(--color-text-secondary)">—</div>'; return; }
+  sec.innerHTML = '<div class="section-label">Buckets (0-9)</div><div style="display:flex;flex-wrap:wrap;gap:2px">' +
+    buckets.map((b, i) => '<div class="bucket"><div class="bucket-label">' + i + '</div><div class="bucket-items">' +
+      b.map(v => '<div class="bucket-item">' + v + '</div>').join('') +
+    '</div></div>').join('') + '</div>';
+}
+
+function digitName(place) { return place === 1 ? '1s (ones)' : place === 10 ? '10s (tens)' : place + 's'; }
+
+function init() {
+  clearInterval(autoTimer); autoTimer = null;
+  document.getElementById('btn-auto').textContent = 'Auto play';
+  allSteps = buildSteps([...VALS]); stepIdx = 0; updateSpeed();
+  renderArray(VALS, -1, false); renderBuckets(null);
+  document.getElementById('step-label').textContent = 'Step 0';
+  document.getElementById('digit-label').textContent = '1s';
+  document.getElementById('pass-label').textContent = '0 / 2';
+  document.getElementById('step-log').textContent = 'Press Step or Auto play to begin';
+  document.getElementById('btn-step').disabled = false;
+}
+
+function updateSpeed() { const v=parseInt(document.getElementById('speed').value); speedMs=1200-v; document.getElementById('speed-label').textContent=(v/500).toFixed(1)+'×'; }
+function setLog(msg) { const el=document.getElementById('step-log'); el.style.opacity='0'; setTimeout(()=>{el.textContent=msg;el.style.opacity='1';},120); }
+
+function applyStep(s) {
+  if (!s) return;
+  document.getElementById('step-label').textContent = 'Step ' + stepIdx;
+  if (s.digitPlace) document.getElementById('digit-label').textContent = digitName(s.digitPlace);
+  if (s.pass !== undefined) document.getElementById('pass-label').textContent = s.pass + ' / ' + (s.numDigits||2);
+
+  if (s.type==='initial') { renderArray(s.arr,-1,false); renderBuckets(null); setLog('Array: ['+s.arr.join(', ')+'] -max has '+s.numDigits+' digits'); }
+  else if (s.type==='pass-start') { renderArray(s.arr,-1,false); renderBuckets(Array.from({length:10},()=>[])); setLog('Pass '+s.pass+': sort by '+digitName(s.digitPlace)); }
+  else if (s.type==='distribute') { renderArray(s.arr,s.idx,false); renderBuckets(s.buckets); setLog(s.val+' → digit='+s.digit+' → bucket['+s.digit+']'); }
+  else if (s.type==='collect') { renderArray(s.arr,-1,false); renderBuckets(s.buckets); setLog('Collect from buckets → ['+s.arr.join(', ')+']'); }
+  else if (s.type==='done') { renderArray(s.arr,-1,true); renderBuckets(null); setLog('Sorted! All digit passes complete'); document.getElementById('btn-step').disabled=true; clearInterval(autoTimer);autoTimer=null; document.getElementById('btn-auto').textContent='Auto play'; }
+}
+
+function stepOnce() { if(stepIdx>=allSteps.length)return; applyStep(allSteps[stepIdx]); stepIdx++; }
+function toggleAuto() { if(autoTimer){clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';}else{document.getElementById('btn-auto').textContent='Pause';autoTimer=setInterval(()=>{if(stepIdx>=allSteps.length){clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';return;}applyStep(allSteps[stepIdx]);stepIdx++;},speedMs);} }
+
+init();
+</script>

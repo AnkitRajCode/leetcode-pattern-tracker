@@ -1,0 +1,333 @@
+
+<style>
+  :root {
+    --color-text-primary: #e2e8f0;
+    --color-text-secondary: #94a3b8;
+    --color-text-info: #93c5fd;
+    --color-text-success: #6ee7b7;
+    --color-background-secondary: #0f172a;
+    --color-background-info: #1e3a5f;
+    --color-background-success: #064e3b;
+    --color-border-secondary: #334155;
+    --color-border-tertiary: #475569;
+    --color-border-success: #065f46;
+    --border-radius-md: 8px;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #020617;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  @keyframes rise { 0%{transform:translateY(0)} 50%{transform:translateY(-8px)} 100%{transform:translateY(0)} }
+  @keyframes swap { 0%{transform:translateX(0)} 30%{transform:translateX(4px)} 70%{transform:translateX(-4px)} 100%{transform:translateX(0)} }
+  @keyframes pulse-ring { 0%{opacity:0.7;transform:scale(1)} 100%{opacity:0;transform:scale(1.5)} }
+  @keyframes settle { 0%{opacity:0;transform:scale(0.7)} 100%{opacity:1;transform:scale(1)} }
+  @keyframes flash-swap { 0%,100%{background:var(--swap-bg,#FAC775)} 50%{background:#EF9F27} }
+  .bubble { transition: left 0.45s cubic-bezier(.4,0,.2,1), background 0.3s, box-shadow 0.3s; position:absolute; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:500; cursor:default; user-select:none; }
+  .bubble.sorted { box-shadow: 0 0 0 2.5px #0F6E56; }
+  .bubble.comparing { box-shadow: 0 0 0 3px #534AB7; animation: rise 0.5s ease-in-out; }
+  .bubble.swapping  { box-shadow: 0 0 0 3px #EF9F27; animation: swap 0.45s ease-in-out; }
+  .bubble.done { animation: settle 0.4s ease-out; }
+  .pass-badge { display:inline-flex; align-items:center; gap:6px; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:500; }
+  .btn { padding:6px 16px; border-radius:var(--border-radius-md); border:0.5px solid var(--color-border-secondary); background:transparent; color:var(--color-text-primary); cursor:pointer; font-size:13px; transition:background 0.15s; }
+  .btn:hover { background:var(--color-background-secondary); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn.primary { background:var(--color-background-info); color:var(--color-text-info); border-color:transparent; }
+  .btn.primary:hover { opacity:0.85; }
+  .legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .step-log { font-size:12px; color:var(--color-text-secondary); min-height:20px; transition:opacity 0.3s; }
+  .tag { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:10px; font-size:11px; font-weight:500; }
+</style>
+
+<div style="padding:1.5rem 0 0">
+
+  <!-- Title row -->
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px">
+    <div>
+      <span style="font-size:16px; font-weight:500; color:var(--color-text-primary)">Bubble sort</span>
+      <span style="font-size:13px; color:var(--color-text-secondary); margin-left:8px">-largest bubbles rise to the top each pass</span>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center">
+      <span id="pass-label" style="font-size:12px; color:var(--color-text-secondary)">Pass 0 of 0</span>
+    </div>
+  </div>
+
+  <!-- Legend -->
+  <div style="display:flex; gap:14px; margin-bottom:20px; flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#AFA9EC;box-shadow:0 0 0 2px #534AB7"></span>Comparing</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#FAC775;box-shadow:0 0 0 2px #EF9F27"></span>Swapping</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#5DCAA5;box-shadow:0 0 0 2px #0F6E56"></span>Sorted in place</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#B4B2A9"></span>Unsorted</span>
+  </div>
+
+  <!-- Bubble stage -->
+  <div id="stage" style="position:relative; height:110px; margin-bottom:12px"></div>
+
+  <!-- Index labels -->
+  <div id="index-row" style="display:flex; justify-content:space-around; margin-bottom:20px; padding:0 4px"></div>
+
+  <!-- Step info -->
+  <div id="step-log" class="step-log" style="margin-bottom:16px; text-align:center; min-height:18px"></div>
+
+  <!-- Pass markers -->
+  <div id="pass-markers" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; min-height:28px"></div>
+
+  <!-- Swap counter + early exit -->
+  <div style="display:flex; gap:16px; margin-bottom:20px; flex-wrap:wrap">
+    <div style="flex:1; min-width:140px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:12px 16px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:4px">Total swaps</div>
+      <div id="swap-count" style="font-size:22px; font-weight:500; color:var(--color-text-primary)">0</div>
+    </div>
+    <div style="flex:1; min-width:140px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:12px 16px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:4px">Comparisons</div>
+      <div id="cmp-count" style="font-size:22px; font-weight:500; color:var(--color-text-primary)">0</div>
+    </div>
+    <div style="flex:2; min-width:200px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:12px 16px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:4px">Swap optimization</div>
+      <div id="opt-status" style="font-size:13px; font-weight:500; color:var(--color-text-secondary)">Watching for no-swap passes…</div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+    <button class="btn primary" id="btn-step" onclick="stepOnce()">Step →</button>
+    <button class="btn" id="btn-auto" onclick="toggleAuto()">Auto play</button>
+    <button class="btn" id="btn-reset" onclick="init()">Reset</button>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:8px; font-size:12px; color:var(--color-text-secondary)">
+      Speed
+      <input type="range" id="speed" min="100" max="900" value="500" step="100" style="width:80px" oninput="updateSpeed()">
+      <span id="speed-label">0.5×</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const VALS = [72, 38, 91, 55, 18, 67, 44];
+const COLORS_BY_SIZE = ['#D3D1C7','#B4B2A9','#9FE1CB','#5DCAA5','#AFA9EC','#7F77DD','#534AB7'];
+const SORTED_STROKE = '#0F6E56';
+
+let arr, sortedEnd, pass, i, swapCount, cmpCount, allSteps, stepIdx, autoTimer, speedMs;
+let animating = false;
+
+function bubbleColor(val) {
+  const mn = Math.min(...VALS), mx = Math.max(...VALS);
+  const idx = Math.round((val - mn) / (mx - mn) * (COLORS_BY_SIZE.length - 1));
+  return COLORS_BY_SIZE[idx];
+}
+
+function bubbleSize(val) {
+  const mn = Math.min(...VALS), mx = Math.max(...VALS);
+  return 38 + Math.round((val - mn) / (mx - mn) * 32);
+}
+
+function buildAllSteps(startArr) {
+  const a = [...startArr];
+  const n = a.length;
+  const steps = [];
+  steps.push({type:'initial', arr:[...a]});
+  for (let p = 0; p < n - 1; p++) {
+    let swappedInPass = false;
+    const passStart = [...a];
+    steps.push({type:'pass-start', pass:p, arr:[...a], sortedEnd: n - p});
+    for (let j = 0; j < n - 1 - p; j++) {
+      steps.push({type:'compare', i:j, j:j+1, arr:[...a], pass:p, sortedEnd: n - p});
+      if (a[j] > a[j+1]) {
+        [a[j], a[j+1]] = [a[j+1], a[j]];
+        swappedInPass = true;
+        steps.push({type:'swap', i:j, j:j+1, arr:[...a], pass:p, sortedEnd: n - p});
+      } else {
+        steps.push({type:'no-swap', i:j, j:j+1, arr:[...a], pass:p, sortedEnd: n - p});
+      }
+    }
+    steps.push({type:'pass-end', pass:p, arr:[...a], sortedEnd: n - p - 1, swapped:swappedInPass});
+    if (!swappedInPass) {
+      steps.push({type:'early-exit', pass:p, arr:[...a], sortedEnd:0});
+      break;
+    }
+  }
+  steps.push({type:'done', arr:[...a]});
+  return steps;
+}
+
+function init() {
+  clearInterval(autoTimer); autoTimer = null;
+  document.getElementById('btn-auto').textContent = 'Auto play';
+  arr = [...VALS];
+  swapCount = 0; cmpCount = 0;
+  allSteps = buildAllSteps([...VALS]);
+  stepIdx = 0;
+  updateSpeed();
+  renderArr(arr, [], [], 0, arr.length);
+  document.getElementById('swap-count').textContent = '0';
+  document.getElementById('cmp-count').textContent = '0';
+  document.getElementById('pass-label').textContent = 'Pass 0 of ' + (arr.length - 1);
+  document.getElementById('pass-markers').innerHTML = '';
+  document.getElementById('step-log').textContent = 'Press Step or Auto play to begin';
+  document.getElementById('opt-status').textContent = 'Watching for no-swap passes…';
+  document.getElementById('opt-status').style.color = 'var(--color-text-secondary)';
+  document.getElementById('btn-step').disabled = false;
+  document.getElementById('btn-auto').disabled = false;
+}
+
+function updateSpeed() {
+  const v = parseInt(document.getElementById('speed').value);
+  speedMs = 1050 - v;
+  const label = (v/500).toFixed(1) + '×';
+  document.getElementById('speed-label').textContent = label;
+}
+
+function renderArr(arr, comparing, swapping, pass, sortedEnd) {
+  const stage = document.getElementById('stage');
+  const indexRow = document.getElementById('index-row');
+  const n = arr.length;
+  const stageW = stage.offsetWidth || 620;
+  const slotW = Math.floor(stageW / n);
+
+  stage.innerHTML = '';
+  indexRow.innerHTML = '';
+
+  arr.forEach((val, idx) => {
+    const size = bubbleSize(val);
+    const color = bubbleColor(val);
+    const cx = slotW * idx + slotW/2 - size/2;
+    const cy = (110 - size) / 2;
+
+    const el = document.createElement('div');
+    el.className = 'bubble';
+    el.style.width = size + 'px';
+    el.style.height = size + 'px';
+    el.style.left = cx + 'px';
+    el.style.top = cy + 'px';
+    el.style.background = color;
+    el.style.fontSize = Math.max(11, size * 0.3) + 'px';
+    el.style.color = '#1e293b';
+    el.textContent = val;
+
+    const isSorted = idx >= sortedEnd;
+    if (isSorted) {
+      el.classList.add('sorted');
+      el.style.background = '#5DCAA5';
+    } else if (swapping.includes(idx)) {
+      el.classList.add('swapping');
+      el.style.background = '#FAC775';
+    } else if (comparing.includes(idx)) {
+      el.classList.add('comparing');
+      el.style.background = '#AFA9EC';
+    }
+
+    stage.appendChild(el);
+
+    // index label
+    const lbl = document.createElement('div');
+    lbl.style.cssText = 'width:' + slotW + 'px; text-align:center; font-size:10px; color:var(--color-text-secondary); font-variant-numeric:tabular-nums';
+    lbl.textContent = idx;
+    indexRow.appendChild(lbl);
+  });
+}
+
+let passMarkers = {};
+
+function addPassMarker(pass, swapped) {
+  if (passMarkers[pass] !== undefined) return;
+  passMarkers[pass] = swapped;
+  const pm = document.getElementById('pass-markers');
+  const badge = document.createElement('span');
+  badge.className = 'pass-badge';
+  if (swapped) {
+    badge.style.cssText = 'background:var(--color-background-secondary); color:var(--color-text-primary); border:0.5px solid var(--color-border-tertiary)';
+    badge.innerHTML = '<span style="font-size:10px">Pass ' + (pass+1) + '</span> <span style="font-size:10px;color:var(--color-text-success)">✓ swaps</span>';
+  } else {
+    badge.style.cssText = 'background:var(--color-background-success); color:var(--color-text-success); border:0.5px solid var(--color-border-success)';
+    badge.innerHTML = '<span style="font-size:10px">Pass ' + (pass+1) + '</span> <span style="font-size:10px">0 swaps → early exit!</span>';
+  }
+  pm.appendChild(badge);
+}
+
+function applyStep(s) {
+  if (!s) return;
+  const n = arr.length;
+
+  if (s.type === 'initial') {
+    renderArr(s.arr, [], [], 0, n);
+    setLog('Array initialized -' + n + ' elements');
+  } else if (s.type === 'pass-start') {
+    passMarkers = {};
+    renderArr(s.arr, [], [], s.pass, s.sortedEnd);
+    document.getElementById('pass-label').textContent = 'Pass ' + (s.pass+1) + ' of ' + (n-1);
+    setLog('Pass ' + (s.pass+1) + ' begins -boundary at index ' + (s.sortedEnd-1));
+  } else if (s.type === 'compare') {
+    cmpCount++;
+    document.getElementById('cmp-count').textContent = cmpCount;
+    renderArr(s.arr, [s.i, s.j], [], s.pass, s.sortedEnd);
+    setLog('Comparing [' + s.i + ']=' + s.arr[s.i] + ' vs [' + s.j + ']=' + s.arr[s.j]);
+  } else if (s.type === 'swap') {
+    swapCount++;
+    document.getElementById('swap-count').textContent = swapCount;
+    renderArr(s.arr, [], [s.i, s.j], s.pass, s.sortedEnd);
+    setLog('Swap! ' + s.arr[s.j] + ' ↔ ' + s.arr[s.i] + ' -larger value moves right');
+  } else if (s.type === 'no-swap') {
+    renderArr(s.arr, [s.i, s.j], [], s.pass, s.sortedEnd);
+    setLog('No swap needed -' + s.arr[s.i] + ' ≤ ' + s.arr[s.j]);
+  } else if (s.type === 'pass-end') {
+    addPassMarker(s.pass, s.swapped);
+    renderArr(s.arr, [], [], s.pass, s.sortedEnd);
+    const largest = s.arr[s.sortedEnd];
+    setLog('Pass ' + (s.pass+1) + ' done -' + largest + ' is now locked in at index ' + s.sortedEnd);
+    document.getElementById('pass-label').textContent = 'Pass ' + (s.pass+1) + ' complete';
+  } else if (s.type === 'early-exit') {
+    addPassMarker(s.pass, false);
+    renderArr(s.arr, [], [], 0, 0);
+    setLog('No swaps in this pass -array is already sorted! Early exit ✓');
+    document.getElementById('opt-status').textContent = '⚡ Early exit triggered -0 swaps detected → sorted!';
+    document.getElementById('opt-status').style.color = 'var(--color-text-success)';
+    document.getElementById('btn-step').disabled = true;
+    clearInterval(autoTimer); autoTimer = null;
+    document.getElementById('btn-auto').textContent = 'Auto play';
+  } else if (s.type === 'done') {
+    renderArr(s.arr, [], [], 0, 0);
+    setLog('Array fully sorted! ' + swapCount + ' swap' + (swapCount!==1?'s':'') + ', ' + cmpCount + ' comparison' + (cmpCount!==1?'s':''));
+    document.getElementById('pass-label').textContent = 'Done ✓';
+    document.getElementById('btn-step').disabled = true;
+    clearInterval(autoTimer); autoTimer = null;
+    document.getElementById('btn-auto').textContent = 'Auto play';
+    if (document.getElementById('opt-status').textContent.startsWith('Watching')) {
+      document.getElementById('opt-status').textContent = 'All passes had swaps -no early exit this run';
+    }
+  }
+}
+
+function setLog(msg) {
+  const el = document.getElementById('step-log');
+  el.style.opacity = '0';
+  setTimeout(() => { el.textContent = msg; el.style.opacity = '1'; }, 120);
+}
+
+function stepOnce() {
+  if (stepIdx >= allSteps.length) return;
+  applyStep(allSteps[stepIdx]);
+  stepIdx++;
+}
+
+function toggleAuto() {
+  if (autoTimer) {
+    clearInterval(autoTimer); autoTimer = null;
+    document.getElementById('btn-auto').textContent = 'Auto play';
+  } else {
+    document.getElementById('btn-auto').textContent = 'Pause';
+    autoTimer = setInterval(() => {
+      if (stepIdx >= allSteps.length) {
+        clearInterval(autoTimer); autoTimer = null;
+        document.getElementById('btn-auto').textContent = 'Auto play';
+        return;
+      }
+      applyStep(allSteps[stepIdx]);
+      stepIdx++;
+    }, speedMs);
+  }
+}
+
+init();
+</script>

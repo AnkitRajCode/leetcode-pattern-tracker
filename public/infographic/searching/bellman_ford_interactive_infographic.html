@@ -1,0 +1,190 @@
+<style>
+  :root {
+    --color-text-primary: #e2e8f0;
+    --color-text-secondary: #94a3b8;
+    --color-text-info: #93c5fd;
+    --color-text-success: #6ee7b7;
+    --color-background-secondary: #0f172a;
+    --color-background-info: #1e3a5f;
+    --color-background-success: #064e3b;
+    --color-border-secondary: #334155;
+    --border-radius-md: 8px;
+  }
+  html, body { margin:0; padding:0; background:#020617; overflow:hidden; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+  .node { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; border:2px solid var(--color-border-secondary); color:var(--color-text-primary); transition:all 0.35s; position:absolute; }
+  .node.processing { border-color:#FAC775; background:rgba(250,199,117,0.2); color:#FAC775; box-shadow:0 0 8px rgba(250,199,117,0.2); }
+  .node.updated { border-color:#93c5fd; background:var(--color-background-info); color:#93c5fd; }
+  .node.finalized { border-color:#5DCAA5; background:rgba(93,202,165,0.15); color:#6ee7b7; }
+  .edge { position:absolute; height:2px; background:var(--color-border-secondary); transform-origin:0 0; transition:background 0.3s; }
+  .edge.active { background:#FAC775; height:3px; }
+  .edge.negative { background:#ef4444; }
+  .edge-label { position:absolute; font-size:9px; color:var(--color-text-secondary); background:#020617; padding:1px 4px; border-radius:3px; }
+  .edge-label.negative { color:#ef4444; }
+  .arrow { position:absolute; width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent; border-bottom:8px solid var(--color-border-secondary); transform-origin:center; }
+  .btn { padding:6px 16px; border-radius:var(--border-radius-md); border:0.5px solid var(--color-border-secondary); background:transparent; color:var(--color-text-primary); cursor:pointer; font-size:13px; transition:background 0.15s; }
+  .btn:hover { background:var(--color-background-secondary); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn.primary { background:var(--color-background-info); color:var(--color-text-info); border-color:transparent; }
+  .legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .step-log { font-size:12px; color:var(--color-text-secondary); min-height:20px; transition:opacity 0.3s; }
+  .dist-table { font-size:11px; border-collapse:collapse; width:100%; }
+  .dist-table td,.dist-table th { padding:4px 6px; text-align:center; border-bottom:1px solid var(--color-border-secondary); }
+  .dist-table th { color:var(--color-text-secondary); font-weight:500; }
+</style>
+
+<div style="padding:1.5rem 1rem 0">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px">
+    <div>
+      <span style="font-size:16px; font-weight:500; color:var(--color-text-primary)">Bellman-Ford Algorithm</span>
+      <span style="font-size:13px; color:var(--color-text-secondary); margin-left:8px">-handles negative weights, O(VE)</span>
+    </div>
+    <span id="step-label" style="font-size:12px; color:var(--color-text-secondary)">Step 0</span>
+  </div>
+
+  <div style="display:flex; gap:14px; margin-bottom:14px; flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:rgba(250,199,117,0.2);border:2px solid #FAC775"></span>Processing edge</span>
+    <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:var(--color-background-info);border:2px solid #93c5fd"></span>Updated</span>
+    <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:rgba(93,202,165,0.15);border:2px solid #5DCAA5"></span>Final</span>
+    <span style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--color-text-secondary)"><span style="color:#ef4444;font-size:12px">−</span>Negative edge</span>
+  </div>
+
+  <div style="display:flex; gap:16px; flex-wrap:wrap">
+    <div style="flex:2; min-width:260px">
+      <div id="graph" style="position:relative; height:180px; background:var(--color-background-secondary); border-radius:var(--border-radius-md)"></div>
+    </div>
+    <div style="flex:1; min-width:150px">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px">
+        <span style="font-size:11px; color:var(--color-text-secondary)">Distance (from A)</span>
+        <span id="iter-label" style="font-size:10px; color:var(--color-text-info)">Iter 0</span>
+      </div>
+      <table class="dist-table" id="dist-table">
+        <tr><th>Node</th><th>dist</th></tr>
+      </table>
+    </div>
+  </div>
+
+  <div id="step-log" class="step-log" style="margin:12px 0; text-align:center"></div>
+
+  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+    <button class="btn primary" id="btn-step" onclick="stepOnce()">Step →</button>
+    <button class="btn" id="btn-auto" onclick="toggleAuto()">Auto play</button>
+    <button class="btn" id="btn-reset" onclick="init()">Reset</button>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:8px; font-size:12px; color:var(--color-text-secondary)">
+      Speed <input type="range" id="speed" min="100" max="900" value="350" step="100" style="width:80px" oninput="updateSpeed()">
+      <span id="speed-label">0.7×</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const LABELS=['A','B','C','D','E'];
+const POS=[[10,50],[35,15],[60,15],[35,85],[60,85]]; // x%, y%
+// Directed edges: [from, to, weight] -includes negative edge
+const EDGES=[[0,1,4],[0,3,5],[1,2,3],[2,4,2],[3,1,-6],[3,4,4],[4,2,-1]];
+
+let allSteps, stepIdx, autoTimer, speedMs;
+
+function buildSteps(){
+  const n=LABELS.length, steps=[];
+  const dist=Array(n).fill(Infinity);
+  dist[0]=0;
+  steps.push({type:'initial',dist:[...dist],iter:0});
+
+  // V-1 iterations
+  for(let iter=1;iter<n;iter++){
+    let anyUpdate=false;
+    steps.push({type:'iter-start',iter,dist:[...dist]});
+    for(const [u,v,w] of EDGES){
+      if(dist[u]===Infinity) continue;
+      const newDist=dist[u]+w;
+      const updated=newDist<dist[v];
+      steps.push({type:'relax',u,v,w,oldDist:dist[v],newDist,updated,dist:[...dist],iter});
+      if(updated){
+        dist[v]=newDist; anyUpdate=true;
+        steps.push({type:'update',u,v,dist:[...dist],iter});
+      }
+    }
+    if(!anyUpdate){steps.push({type:'early-stop',iter,dist:[...dist]});break;}
+  }
+  steps.push({type:'done',dist:[...dist]});
+  return steps;
+}
+
+function drawGraph(activeEdge, updatedNode, processingNode){
+  const g=document.getElementById('graph');
+  const w=g.offsetWidth||300, h=180;
+  g.innerHTML='';
+
+  // Draw edges (directed)
+  EDGES.forEach(([u,v,wt])=>{
+    const x1=POS[u][0]*w/100,y1=POS[u][1]*h/100;
+    const x2=POS[v][0]*w/100,y2=POS[v][1]*h/100;
+    const len=Math.sqrt((x2-x1)**2+(y2-y1)**2);
+    const angle=Math.atan2(y2-y1,x2-x1)*180/Math.PI;
+    const edge=document.createElement('div');
+    edge.className='edge';
+    if(wt<0) edge.classList.add('negative');
+    if(activeEdge&&activeEdge[0]===u&&activeEdge[1]===v) edge.classList.add('active');
+    edge.style.cssText=`width:${len}px;left:${x1}px;top:${y1}px;transform:rotate(${angle}deg)`;
+    g.appendChild(edge);
+    const lbl=document.createElement('div');
+    lbl.className='edge-label';
+    if(wt<0) lbl.classList.add('negative');
+    lbl.textContent=wt;
+    lbl.style.left=((x1+x2)/2-6)+'px';lbl.style.top=((y1+y2)/2-10)+'px';
+    g.appendChild(lbl);
+  });
+
+  LABELS.forEach((label,idx)=>{
+    const node=document.createElement('div');
+    node.className='node';
+    node.textContent=label;
+    node.style.left=(POS[idx][0]*w/100-20)+'px';
+    node.style.top=(POS[idx][1]*h/100-20)+'px';
+    if(idx===processingNode) node.classList.add('processing');
+    else if(idx===updatedNode) node.classList.add('updated');
+    g.appendChild(node);
+  });
+}
+
+function renderDistTable(dist){
+  const t=document.getElementById('dist-table');
+  t.innerHTML='<tr><th>Node</th><th>dist</th></tr>';
+  LABELS.forEach((l,i)=>{
+    const row=document.createElement('tr');
+    const d=dist[i]===Infinity?'∞':dist[i];
+    row.innerHTML=`<td style="color:var(--color-text-primary)">${l}</td><td style="color:${dist[i]===Infinity?'var(--color-text-secondary)':'var(--color-text-info)'}">${d}</td>`;
+    t.appendChild(row);
+  });
+}
+
+function init(){
+  clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';
+  allSteps=buildSteps();stepIdx=0;updateSpeed();
+  const initDist=Array(LABELS.length).fill(Infinity);initDist[0]=0;
+  drawGraph(null,-1,-1); renderDistTable(initDist);
+  document.getElementById('iter-label').textContent='Iter 0';
+  document.getElementById('step-label').textContent='Step 0';
+  document.getElementById('step-log').textContent='Bellman-Ford: relax ALL edges V-1 times -handles negative weights';
+  document.getElementById('btn-step').disabled=false;
+}
+
+function updateSpeed(){const v=parseInt(document.getElementById('speed').value);speedMs=1300-v;document.getElementById('speed-label').textContent=(v/500).toFixed(1)+'×';}
+function setLog(msg){const el=document.getElementById('step-log');el.style.opacity='0';setTimeout(()=>{el.textContent=msg;el.style.opacity='1';},120);}
+
+function applyStep(s){
+  if(!s)return;
+  document.getElementById('step-label').textContent='Step '+stepIdx;
+  if(s.type==='initial'){drawGraph(null,-1,-1);renderDistTable(s.dist);setLog('Initialize: dist[A]=0, all others ∞');}
+  else if(s.type==='iter-start'){document.getElementById('iter-label').textContent='Iter '+s.iter;drawGraph(null,-1,-1);setLog('━━ Iteration '+s.iter+' of '+(LABELS.length-1)+' ━━');}
+  else if(s.type==='relax'){drawGraph([s.u,s.v],-1,s.u);renderDistTable(s.dist);const dU=s.dist[s.u]===Infinity?'∞':s.dist[s.u];const dV=s.oldDist===Infinity?'∞':s.oldDist;setLog(LABELS[s.u]+'→'+LABELS[s.v]+' (w='+s.w+'): '+dU+'+'+s.w+'='+s.newDist+(s.updated?' < '+dV+' ✓':' ≥ '+dV));}
+  else if(s.type==='update'){drawGraph([s.u,s.v],s.v,-1);renderDistTable(s.dist);setLog('Updated dist['+LABELS[s.v]+']='+s.dist[s.v]);}
+  else if(s.type==='early-stop'){drawGraph(null,-1,-1);renderDistTable(s.dist);setLog('No updates in iter '+s.iter+' → early termination!');}
+  else if(s.type==='done'){drawGraph(null,-1,-1);renderDistTable(s.dist);setLog('Done! Shortest distances: '+LABELS.map((l,i)=>l+'='+s.dist[i]).join(', '));document.getElementById('step-label').textContent='Done ✓';document.getElementById('btn-step').disabled=true;clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';}
+}
+
+function stepOnce(){if(stepIdx>=allSteps.length)return;applyStep(allSteps[stepIdx]);stepIdx++;}
+function toggleAuto(){if(autoTimer){clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';}else{document.getElementById('btn-auto').textContent='Pause';autoTimer=setInterval(()=>{if(stepIdx>=allSteps.length){clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';return;}applyStep(allSteps[stepIdx]);stepIdx++;},speedMs);}}
+
+init();
+</script>

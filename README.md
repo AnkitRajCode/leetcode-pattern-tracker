@@ -28,10 +28,10 @@
 
 | Feature | Description |
 |---|---|
-| 📊 **Pattern-Based Learning** | Problems organized by DSA patterns — Arrays & Hashing, Strings, Linked Lists, Dynamic Programming, Graphs, Trees |
+| 📊 **Pattern-Based Learning** | Problems organized by DSA patterns -Arrays & Hashing, Strings, Linked Lists, Dynamic Programming, Graphs, Trees |
 | ✅ **Progress Tracking** | Mark questions as Solved, Revision, or Unsolved with persistent state |
 | 🔗 **LeetCode Sync** | Connect your LeetCode profile and auto-sync solved problems |
-| 📈 **Dashboard Analytics** | Visual progress stats — overall completion %, difficulty breakdown (Easy / Medium / Hard) |
+| 📈 **Dashboard Analytics** | Visual progress stats -overall completion %, difficulty breakdown (Easy / Medium / Hard) |
 | 🔐 **Firebase Authentication** | Google sign-in to save and sync progress across devices |
 | 🌗 **Dark / Light Theme** | System-aware theme toggle with smooth transitions |
 | 📝 **Markdown Solutions** | Rich solutions with syntax-highlighted code blocks |
@@ -118,7 +118,7 @@ npm start
 ```
 leetcode-pattern-tracker/
 ├── app/
-│   ├── page.tsx              # Homepage — topic cards & hero section
+│   ├── page.tsx              # Homepage -topic cards & hero section
 │   ├── layout.tsx            # Root layout with providers & metadata
 │   ├── dashboard/            # Dashboard with progress stats & LeetCode sync
 │   ├── topics/[topic]/       # Dynamic topic pages with question tables
@@ -171,17 +171,17 @@ leetcode-pattern-tracker/
 ### LeetCode Lists & Problem Sets
 
 #### Comprehensive Lists
-- [LeetCode Lists — Blind 75, Grind 75, Grind 169, Neetcode 150, SQL 45](https://leetcode.com/discuss/post/3691891/leetcode-lists-for-blind-75-grind-75-gri-drdb/)
+- [LeetCode Lists -Blind 75, Grind 75, Grind 169, Neetcode 150, SQL 45](https://leetcode.com/discuss/post/3691891/leetcode-lists-for-blind-75-grind-75-gri-drdb/)
 
 #### Grind 75
-- [Grind 75 — Tech Interview Handbook](https://www.techinterviewhandbook.org/grind75/)
+- [Grind 75 -Tech Interview Handbook](https://www.techinterviewhandbook.org/grind75/)
 - [Grind 75 CSV List](https://gist.github.com/cgjosephlee/c67f3810cf1e7efde0d9a32dd976f400#file-grind75-csv)
 
 #### Blind 75
 - [Blind 75 Problem List](https://leetcode.com/problem-list/oizxjoit/)
 - [Blind 75 Spreadsheet](https://docs.google.com/spreadsheets/d/1snAXQazLrrr1URiYOZGUG6gmwloa3BkMhS9d1oL2x2E/edit?gid=0#gid=0)
-- [Top 75 LeetCode Questions — GitHub](https://github.com/SamirPaulb/top-75-leetcode-questions)
-- [Top 75 LeetCode Questions — Web Version](https://samirpaulb.github.io/top-75-leetcode-questions/)
+- [Top 75 LeetCode Questions -GitHub](https://github.com/SamirPaulb/top-75-leetcode-questions)
+- [Top 75 LeetCode Questions -Web Version](https://samirpaulb.github.io/top-75-leetcode-questions/)
 
 #### Neetcode 150
 - [Neetcode 150 Spreadsheet](https://docs.google.com/spreadsheets/d/1Og4eTkHr4hzELXcM3TSUU9jXJoo2nnjZAtV7XypWTRI/edit?gid=0#gid=0)
@@ -196,7 +196,7 @@ leetcode-pattern-tracker/
 - [DSA Sheet by Love Babbar](https://www.geeksforgeeks.org/dsa/dsa-sheet-by-love-babbar/#arrays)
 - [Striver's SDE Sheet](https://takeuforward.org/dsa/strivers-sde-sheet-top-coding-interview-problems)
 - [Striver's 79 Last Moment DSA Sheet](https://takeuforward.org/dsa/strivers-79-last-moment-dsa-sheet-ace-interviews)
-- [DSA Patterns Roadmap — KushalVijay](https://github.com/KushalVijay/DSA-patterns-Roadmap)
+- [DSA Patterns Roadmap -KushalVijay](https://github.com/KushalVijay/DSA-patterns-Roadmap)
 - [AlgoMaster DSA Course Roadmap](https://algomaster.io/learn/dsa/course-roadmap)
 - [SDE Sheets Collection](https://sdesheets.bio.link/)
 
@@ -204,37 +204,37 @@ leetcode-pattern-tracker/
 
 ### Interview Preparation
 
-- [Tech Interview Handbook — GitHub](https://github.com/yangshun/tech-interview-handbook)
-- [Interview Master 100 — Instabyte](https://instabyte.io/p/interview-master-100)
-- [DSA Master — Instabyte](https://instabyte.io/p/dsa-master)
+- [Tech Interview Handbook -GitHub](https://github.com/yangshun/tech-interview-handbook)
+- [Interview Master 100 -Instabyte](https://instabyte.io/p/interview-master-100)
+- [DSA Master -Instabyte](https://instabyte.io/p/dsa-master)
 - [FAANG Coding Interview Questions](https://github.com/ombharatiya/FAANG-Coding-Interview-Questions)
-- [Design Patterns Catalog — Refactoring Guru](https://refactoring.guru/design-patterns/catalog)
+- [Design Patterns Catalog -Refactoring Guru](https://refactoring.guru/design-patterns/catalog)
 
 ### Data Structures Visualization
 
-- [CSVIZ Tool — ArrayList](https://csvistool.com/ArrayList)
-- [VisuAlgo — Data Structures & Algorithms](https://visualgo.net/en)
+- [CSVIZ Tool -ArrayList](https://csvistool.com/ArrayList)
+- [VisuAlgo -Data Structures & Algorithms](https://visualgo.net/en)
 
 ---
 
 ### System Design
 
 #### 📘 Courses & Roadmaps
-- [InterviewReady — System Design Course](https://interviewready.io/course-page/system-design-course)
-- [Complete System Design Roadmap — takeUforward](https://takeuforward.org/system-design/complete-system-design-roadmap-with-videos-for-sdes)
-- [AlgoMaster — System Design Course Introduction](https://algomaster.io/learn/system-design/course-introduction)
+- [InterviewReady -System Design Course](https://interviewready.io/course-page/system-design-course)
+- [Complete System Design Roadmap -takeUforward](https://takeuforward.org/system-design/complete-system-design-roadmap-with-videos-for-sdes)
+- [AlgoMaster -System Design Course Introduction](https://algomaster.io/learn/system-design/course-introduction)
 
 #### 🔧 LLD Resources
-- [LLD Coding — Practice Low Level Design](https://www.lldcoding.com/)
+- [LLD Coding -Practice Low Level Design](https://www.lldcoding.com/)
 
 #### 📦 HLD / System Design Repositories
-- [HLD System Designs — Anshul619](https://github.com/Anshul619/HLD-System-Designs?tab=readme-ov-file)
-- [GitHub Topics — High Level Design](https://github.com/topics/high-level-design)
-- [System Design LLD & HLD — vivek-panchal](https://github.com/vivek-panchal/System-Design-LLD-HLD)
-- [SystemDesign Playbook — DesignNerds](https://github.com/DesignNerds/SystemDesign-Playbook)
-- [System Design Academy — systemdesign42](https://github.com/systemdesign42/system-design-academy?tab=readme-ov-file)
-- [Best System Design Resources — armankhondker](https://github.com/armankhondker/best-system-design-resources?tab=readme-ov-file)
-- [Awesome System Design Resources — ashishps1](https://github.com/ashishps1/awesome-system-design-resources?tab=readme-ov-file)
+- [HLD System Designs -Anshul619](https://github.com/Anshul619/HLD-System-Designs?tab=readme-ov-file)
+- [GitHub Topics -High Level Design](https://github.com/topics/high-level-design)
+- [System Design LLD & HLD -vivek-panchal](https://github.com/vivek-panchal/System-Design-LLD-HLD)
+- [SystemDesign Playbook -DesignNerds](https://github.com/DesignNerds/SystemDesign-Playbook)
+- [System Design Academy -systemdesign42](https://github.com/systemdesign42/system-design-academy?tab=readme-ov-file)
+- [Best System Design Resources -armankhondker](https://github.com/armankhondker/best-system-design-resources?tab=readme-ov-file)
+- [Awesome System Design Resources -ashishps1](https://github.com/ashishps1/awesome-system-design-resources?tab=readme-ov-file)
 
 #### 🧠 Deep Dives
 - [Introduction to NoSQL Databases](https://corewise.video/extraction/4fbc22d3-5e1c-4b8f-92d0-73976abda193)
@@ -251,7 +251,7 @@ leetcode-pattern-tracker/
 - [Java Roadmap](https://roadmap.sh/java)
 
 #### Backend Fundamentals
-- **Backend from First Principles** by Sriniously — [YouTube Playlist](https://www.youtube.com/watch?v=0Rwb4Xmlcwc&list=PLui3EUkuMTPgZcV0QhQrOcwMPcBCcd_Q1&index=2)
+- **Backend from First Principles** by Sriniously -[YouTube Playlist](https://www.youtube.com/watch?v=0Rwb4Xmlcwc&list=PLui3EUkuMTPgZcV0QhQrOcwMPcBCcd_Q1&index=2)
 
 ---
 
@@ -259,11 +259,11 @@ leetcode-pattern-tracker/
 
 | Area | Repository |
 |---|---|
-| **Java** | [Java Code Examples — navinreddy20](https://github.com/navinreddy20/Javacode) |
-| **Spring 6** | [Spring 6 Course — navinreddy20](https://github.com/navinreddy20/spring6-course) |
-| **Microservices** | [Microservices Tutorials — navinreddy20](https://github.com/navinreddy20/MicroserviceTutorials) |
-| **AI/ML** | [LangChain and Ollama — laxmimerit](https://github.com/laxmimerit/LangChain-and-Ollama) |
-| **Angular** | [Angular Interview Questions — sudheerj](https://github.com/sudheerj/angular-interview-questions) |
+| **Java** | [Java Code Examples -navinreddy20](https://github.com/navinreddy20/Javacode) |
+| **Spring 6** | [Spring 6 Course -navinreddy20](https://github.com/navinreddy20/spring6-course) |
+| **Microservices** | [Microservices Tutorials -navinreddy20](https://github.com/navinreddy20/MicroserviceTutorials) |
+| **AI/ML** | [LangChain and Ollama -laxmimerit](https://github.com/laxmimerit/LangChain-and-Ollama) |
+| **Angular** | [Angular Interview Questions -sudheerj](https://github.com/sudheerj/angular-interview-questions) |
 
 ---
 
@@ -271,7 +271,7 @@ leetcode-pattern-tracker/
 
 - [Copy of Aryan DSA-169 Series](https://docs.google.com/spreadsheets/d/1RfA06xazIWlBKr5tJrgN5rGdbaH_Oxs_VSyddjgOyuU/edit?gid=0#gid=0)
 - [AlgoPrep's 151 Problems Sheet](https://docs.google.com/spreadsheets/d/1kyHfGGaLTzWspcqMUUS5Httmip7t8LJB0P-uPrRLGos/edit?gid=0#gid=0)
-- [CodinGame — Container Terminal](https://www.codingame.com/ide/puzzle/container-terminal)
+- [CodinGame -Container Terminal](https://www.codingame.com/ide/puzzle/container-terminal)
 
 ---
 
@@ -298,7 +298,7 @@ This project is open source and available under the [MIT License](LICENSE).
 **Ankit Raj**
 
 <p>
-  <a href="https://ankitraj.pages.dev">🌐 Portfolio</a> &nbsp;·&nbsp;
+  <a href="https://ankitrajcode.in">🌐 Portfolio</a> &nbsp;·&nbsp;
   <a href="https://github.com/AnkitRajCode">GitHub</a> &nbsp;·&nbsp;
   <a href="https://twitter.com/AnkitRajCode">Twitter</a> &nbsp;·&nbsp;
   <a href="https://linkedin.com/in/AnkitRajCode">LinkedIn</a>

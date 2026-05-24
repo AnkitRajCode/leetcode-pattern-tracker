@@ -1,0 +1,166 @@
+<style>
+  :root {
+    --color-text-primary: #e2e8f0;
+    --color-text-secondary: #94a3b8;
+    --color-text-info: #93c5fd;
+    --color-text-success: #6ee7b7;
+    --color-background-secondary: #0f172a;
+    --color-background-info: #1e3a5f;
+    --color-border-secondary: #334155;
+    --border-radius-md: 8px;
+  }
+  html, body { margin:0; padding:0; background:#020617; overflow:hidden; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+  .bar { transition: left 0.35s cubic-bezier(.4,0,.2,1), background 0.3s, box-shadow 0.3s; position:absolute; border-radius:6px 6px 0 0; display:flex; align-items:flex-start; justify-content:center; padding-top:5px; font-weight:500; font-size:11px; cursor:default; user-select:none; }
+  .bar.comparing { background:#AFA9EC !important; box-shadow:0 0 0 2px #534AB7; }
+  .bar.swapping { background:#FAC775 !important; box-shadow:0 0 0 2px #EF9F27; }
+  .bar.sorted { background:#5DCAA5 !important; box-shadow:0 0 0 2px #0F6E56; }
+  .bar.bitonic-up { background:#7F77DD !important; box-shadow:0 0 0 2px #534AB7; }
+  .bar.bitonic-down { background:#ef4444 !important; box-shadow:0 0 0 2px #b91c1c; }
+  .btn { padding:6px 16px; border-radius:var(--border-radius-md); border:0.5px solid var(--color-border-secondary); background:transparent; color:var(--color-text-primary); cursor:pointer; font-size:13px; transition:background 0.15s; }
+  .btn:hover { background:var(--color-background-secondary); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn.primary { background:var(--color-background-info); color:var(--color-text-info); border-color:transparent; }
+  .legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .step-log { font-size:12px; color:var(--color-text-secondary); min-height:20px; transition:opacity 0.3s; }
+</style>
+
+<div style="padding:1.5rem 1rem 0">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px">
+    <div>
+      <span style="font-size:16px; font-weight:500; color:var(--color-text-primary)">Bitonic sort</span>
+      <span style="font-size:13px; color:var(--color-text-secondary); margin-left:8px">-build bitonic sequence, then merge</span>
+    </div>
+    <span id="step-label" style="font-size:12px; color:var(--color-text-secondary)">Step 0</span>
+  </div>
+
+  <div style="display:flex; gap:14px; margin-bottom:20px; flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#7F77DD"></span>Ascending</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#ef4444"></span>Descending</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#FAC775"></span>Comparing/Swapping</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#5DCAA5"></span>Sorted</span>
+  </div>
+
+  <div id="stage" style="position:relative; height:130px; margin-bottom:8px"></div>
+  <div id="index-row" style="display:flex; justify-content:space-around; margin-bottom:16px; padding:0 4px"></div>
+  <div id="step-log" class="step-log" style="margin-bottom:14px; text-align:center"></div>
+
+  <div style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap">
+    <div style="flex:1; min-width:100px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:3px">Swaps</div>
+      <div id="swap-count" style="font-size:20px; font-weight:500; color:var(--color-text-primary)">0</div>
+    </div>
+    <div style="flex:1; min-width:100px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:3px">Comparisons</div>
+      <div id="cmp-count" style="font-size:20px; font-weight:500; color:var(--color-text-primary)">0</div>
+    </div>
+    <div style="flex:2; min-width:160px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:3px">Key insight</div>
+      <div style="font-size:12px; font-weight:500; color:var(--color-text-secondary)">O(n log²n) -parallelizable, great for GPU sorting</div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+    <button class="btn primary" id="btn-step" onclick="stepOnce()">Step →</button>
+    <button class="btn" id="btn-auto" onclick="toggleAuto()">Auto play</button>
+    <button class="btn" id="btn-reset" onclick="init()">Reset</button>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:8px; font-size:12px; color:var(--color-text-secondary)">
+      Speed <input type="range" id="speed" min="100" max="900" value="400" step="100" style="width:80px" oninput="updateSpeed()">
+      <span id="speed-label">0.8×</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// Pad to power of 2 for bitonic sort
+const ORIG_VALS = [72, 38, 91, 55, 18, 67, 44, 83];
+const VALS = [...ORIG_VALS];
+let arr, allSteps, stepIdx, autoTimer, speedMs, swapCount, cmpCount;
+
+function barHeight(val){const mn=Math.min(...VALS),mx=Math.max(...VALS);return 30+Math.round((val-mn)/(mx-mn)*85);}
+function barColor(val){const mn=Math.min(...VALS),mx=Math.max(...VALS),t=(val-mn)/(mx-mn);return `hsl(${210+t*30},${30+t*20}%,${48+t*18}%)`;}
+
+function buildSteps(startArr) {
+  const a=[...startArr], n=a.length, steps=[];
+  steps.push({type:'initial',arr:[...a]});
+
+  function bitonicMerge(lo, cnt, asc) {
+    if(cnt>1) {
+      const k=Math.floor(cnt/2);
+      for(let i=lo;i<lo+k;i++) {
+        steps.push({type:'compare',arr:[...a],i,j:i+k,asc});
+        if((asc&&a[i]>a[i+k])||(!asc&&a[i]<a[i+k])) {
+          [a[i],a[i+k]]=[a[i+k],a[i]];
+          steps.push({type:'swap',arr:[...a],i,j:i+k,asc});
+        }
+      }
+      bitonicMerge(lo,k,asc);
+      bitonicMerge(lo+k,k,asc);
+    }
+  }
+
+  function bitonicSort(lo, cnt, asc) {
+    if(cnt>1) {
+      const k=Math.floor(cnt/2);
+      steps.push({type:'split',arr:[...a],lo,k:cnt,asc,leftAsc:true,rightAsc:false});
+      bitonicSort(lo,k,true);
+      bitonicSort(lo+k,k,false);
+      steps.push({type:'merge-phase',arr:[...a],lo,k:cnt,asc});
+      bitonicMerge(lo,cnt,asc);
+    }
+  }
+
+  bitonicSort(0,n,true);
+  steps.push({type:'done',arr:[...a]});
+  return steps;
+}
+
+function renderArr(a,hl1,hl2,done){
+  const stage=document.getElementById('stage'),indexRow=document.getElementById('index-row');
+  const n=a.length,stageW=stage.offsetWidth||600,slotW=Math.floor(stageW/n),barW=Math.min(slotW-8,45);
+  stage.innerHTML='';indexRow.innerHTML='';
+  a.forEach((val,idx)=>{
+    const h=barHeight(val),el=document.createElement('div');
+    el.className='bar';el.style.width=barW+'px';el.style.height=h+'px';
+    el.style.left=(slotW*idx+(slotW-barW)/2)+'px';el.style.bottom='0';
+    el.style.background=barColor(val);el.style.color='#e2e8f0';el.textContent=val;
+    if(done)el.classList.add('sorted');
+    else if(idx===hl1||idx===hl2)el.classList.add('comparing');
+    stage.appendChild(el);
+    const lbl=document.createElement('div');
+    lbl.style.cssText='width:'+slotW+'px;text-align:center;font-size:10px;color:var(--color-text-secondary)';
+    lbl.textContent=idx;indexRow.appendChild(lbl);
+  });
+}
+
+function init(){
+  clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';
+  arr=[...VALS];swapCount=0;cmpCount=0;
+  allSteps=buildSteps([...VALS]);stepIdx=0;updateSpeed();
+  renderArr(arr,-1,-1,false);
+  document.getElementById('swap-count').textContent='0';
+  document.getElementById('cmp-count').textContent='0';
+  document.getElementById('step-label').textContent='Step 0';
+  document.getElementById('step-log').textContent='Press Step or Auto play to begin';
+  document.getElementById('btn-step').disabled=false;
+}
+
+function updateSpeed(){const v=parseInt(document.getElementById('speed').value);speedMs=1100-v;document.getElementById('speed-label').textContent=(v/500).toFixed(1)+'×';}
+function setLog(msg){const el=document.getElementById('step-log');el.style.opacity='0';setTimeout(()=>{el.textContent=msg;el.style.opacity='1';},120);}
+
+function applyStep(s){
+  if(!s)return;
+  document.getElementById('step-label').textContent='Step '+stepIdx;
+  arr=[...s.arr];
+  if(s.type==='initial'){renderArr(s.arr,-1,-1,false);setLog('Array: ['+s.arr.join(', ')+'] (size='+s.arr.length+', power of 2)');}
+  else if(s.type==='split'){renderArr(s.arr,-1,-1,false);setLog('Split ['+s.lo+'..'+(s.lo+s.k-1)+'] -left↑ right↓ → build bitonic sequence');}
+  else if(s.type==='merge-phase'){renderArr(s.arr,-1,-1,false);setLog('Bitonic merge ['+s.lo+'..'+(s.lo+s.k-1)+'] '+(s.asc?'ascending':'descending'));}
+  else if(s.type==='compare'){cmpCount++;document.getElementById('cmp-count').textContent=cmpCount;renderArr(s.arr,s.i,s.j,false);setLog('Compare ['+s.i+']='+s.arr[s.i]+' vs ['+s.j+']='+s.arr[s.j]+' ('+(s.asc?'asc':'desc')+')');}
+  else if(s.type==='swap'){swapCount++;document.getElementById('swap-count').textContent=swapCount;renderArr(s.arr,s.i,s.j,false);setLog('Swap ['+s.i+']↔['+s.j+'] → '+s.arr[s.i]+', '+s.arr[s.j]);}
+  else if(s.type==='done'){renderArr(s.arr,-1,-1,true);setLog('Sorted! '+swapCount+' swaps, '+cmpCount+' comparisons -O(n log²n)');document.getElementById('step-label').textContent='Done ✓';document.getElementById('btn-step').disabled=true;clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';}
+}
+
+function stepOnce(){if(stepIdx>=allSteps.length)return;applyStep(allSteps[stepIdx]);stepIdx++;}
+function toggleAuto(){if(autoTimer){clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';}else{document.getElementById('btn-auto').textContent='Pause';autoTimer=setInterval(()=>{if(stepIdx>=allSteps.length){clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';return;}applyStep(allSteps[stepIdx]);stepIdx++;},speedMs);}}
+
+init();
+</script>

@@ -1,4 +1,4 @@
-Choosing between **Kafka** and **RabbitMQ** isn’t about “which is better” — it’s about **use case fit**. They solve different problems even though both are messaging systems.
+Choosing between **Kafka** and **RabbitMQ** isn’t about “which is better” -it’s about **use case fit**. They solve different problems even though both are messaging systems.
 
 Let’s break it down in a way that actually helps you decide in real projects 👇
 

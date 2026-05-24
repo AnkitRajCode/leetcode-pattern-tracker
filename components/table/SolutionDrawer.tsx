@@ -3,13 +3,15 @@
 import {
     Sheet,
     SheetContent,
+    SheetDescription,
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import { Question } from "@/types/question";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
-import { Brain, Building2, Layers, Youtube } from "lucide-react";
+import { Brain, Building2, Layers } from "lucide-react";
+import { Youtube } from "@/components/icons/BrandIcons";
 
 interface SolutionDrawerProps {
     question: Question;
@@ -39,6 +41,9 @@ export default function SolutionDrawer({
                         <SheetTitle className="text-2xl font-bold text-slate-900 dark:text-white leading-tight">
                             {question.title}
                         </SheetTitle>
+                        <SheetDescription className="sr-only">
+                            Solution and explanation for {question.title}
+                        </SheetDescription>
                         <div className="flex items-center gap-3 mb-2">
                             <Badge variant="outline" className={`${difficultyColor[question.difficulty as keyof typeof difficultyColor]} capitalize px-2 py-0.5`}>
                                 {question.difficulty}

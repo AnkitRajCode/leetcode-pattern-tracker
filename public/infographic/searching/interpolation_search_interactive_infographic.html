@@ -1,0 +1,179 @@
+<style>
+  :root {
+    --color-text-primary: #e2e8f0;
+    --color-text-secondary: #94a3b8;
+    --color-text-info: #93c5fd;
+    --color-text-success: #6ee7b7;
+    --color-background-secondary: #0f172a;
+    --color-background-info: #1e3a5f;
+    --color-background-success: #064e3b;
+    --color-border-secondary: #334155;
+    --border-radius-md: 8px;
+  }
+  html, body { margin:0; padding:0; background:#020617; overflow:hidden; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+  .cell { display:inline-flex; align-items:center; justify-content:center; width:48px; height:44px; border:1.5px solid var(--color-border-secondary); border-radius:6px; font-size:14px; font-weight:500; color:var(--color-text-primary); transition:all 0.3s; margin:0 3px; }
+  .cell.eliminated { border-color:#475569; background:rgba(71,85,105,0.2); color:#64748b; opacity:0.5; }
+  .cell.active { border-color:#93c5fd; background:var(--color-background-info); color:var(--color-text-info); }
+  .cell.probe { border-color:#FAC775; background:rgba(250,199,117,0.15); color:#FAC775; box-shadow:0 0 8px rgba(250,199,117,0.2); }
+  .cell.found { border-color:#065f46; background:var(--color-background-success); color:var(--color-text-success); box-shadow:0 0 12px rgba(110,231,183,0.3); }
+  .btn { padding:6px 16px; border-radius:var(--border-radius-md); border:0.5px solid var(--color-border-secondary); background:transparent; color:var(--color-text-primary); cursor:pointer; font-size:13px; transition:background 0.15s; }
+  .btn:hover { background:var(--color-background-secondary); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn.primary { background:var(--color-background-info); color:var(--color-text-info); border-color:transparent; }
+  .legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .step-log { font-size:12px; color:var(--color-text-secondary); min-height:20px; transition:opacity 0.3s; }
+</style>
+
+<div style="padding:1.5rem 1rem 0">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px">
+    <div>
+      <span style="font-size:16px; font-weight:500; color:var(--color-text-primary)">Interpolation search</span>
+      <span style="font-size:13px; color:var(--color-text-secondary); margin-left:8px">-estimate position, O(log log n) uniform</span>
+    </div>
+    <span id="step-label" style="font-size:12px; color:var(--color-text-secondary)">Step 0</span>
+  </div>
+
+  <div style="display:flex; gap:14px; margin-bottom:18px; flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:var(--color-background-info);border:1px solid #93c5fd"></span>Active range</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:rgba(250,199,117,0.15);border:1px solid #FAC775"></span>Probe position</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:var(--color-background-success);border:1px solid #065f46"></span>Found</span>
+  </div>
+
+  <div style="background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:16px; margin-bottom:6px">
+    <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:8px">Target: <span style="color:var(--color-text-info); font-weight:600; font-size:14px">67</span> &nbsp;|&nbsp; Uniformly distributed sorted array</div>
+    <div id="array-display" style="display:flex; flex-wrap:wrap; justify-content:center; gap:2px"></div>
+    <div id="marker-row" style="display:flex; flex-wrap:wrap; justify-content:center; gap:2px; margin-top:4px"></div>
+  </div>
+
+  <div id="formula-display" style="background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px; margin-bottom:10px; font-size:12px; color:var(--color-text-secondary); text-align:center">
+    pos = low + ⌊(target − arr[low]) × (high − low) / (arr[high] − arr[low])⌋
+  </div>
+
+  <div id="step-log" class="step-log" style="margin-bottom:14px; text-align:center"></div>
+
+  <div style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap">
+    <div style="flex:1; min-width:80px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:3px">low</div>
+      <div id="low-display" style="font-size:18px; font-weight:500; color:var(--color-text-primary)">0</div>
+    </div>
+    <div style="flex:1; min-width:80px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:3px">high</div>
+      <div id="high-display" style="font-size:18px; font-weight:500; color:var(--color-text-primary)">11</div>
+    </div>
+    <div style="flex:1; min-width:80px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:3px">probe</div>
+      <div id="probe-display" style="font-size:18px; font-weight:500; color:#FAC775">—</div>
+    </div>
+    <div style="flex:1; min-width:80px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:3px">Comparisons</div>
+      <div id="cmp-count" style="font-size:18px; font-weight:500; color:var(--color-text-primary)">0</div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+    <button class="btn primary" id="btn-step" onclick="stepOnce()">Step →</button>
+    <button class="btn" id="btn-auto" onclick="toggleAuto()">Auto play</button>
+    <button class="btn" id="btn-reset" onclick="init()">Reset</button>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:8px; font-size:12px; color:var(--color-text-secondary)">
+      Speed <input type="range" id="speed" min="100" max="900" value="400" step="100" style="width:80px" oninput="updateSpeed()">
+      <span id="speed-label">0.8×</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const ARR = [5, 12, 18, 27, 34, 44, 55, 67, 72, 83, 91, 98];
+const TARGET = 67;
+let allSteps, stepIdx, autoTimer, speedMs, cmpCount;
+
+function buildSteps() {
+  const steps = [{type:'initial', low:0, high:ARR.length-1}];
+  let low = 0, high = ARR.length - 1;
+  while (low <= high && TARGET >= ARR[low] && TARGET <= ARR[high]) {
+    const pos = low + Math.floor(((TARGET - ARR[low]) * (high - low)) / (ARR[high] - ARR[low]));
+    steps.push({type:'calc-pos', low, high, pos, formula:`${low} + ⌊(${TARGET}-${ARR[low]})×(${high}-${low})/(${ARR[high]}-${ARR[low]})⌋ = ${pos}`});
+    steps.push({type:'compare', low, high, pos, val:ARR[pos]});
+    if (ARR[pos] === TARGET) { steps.push({type:'found', idx:pos, low, high}); return steps; }
+    else if (ARR[pos] < TARGET) { low = pos + 1; steps.push({type:'go-right', low, high, pos}); }
+    else { high = pos - 1; steps.push({type:'go-left', low, high, pos}); }
+  }
+  steps.push({type:'not-found'});
+  return steps;
+}
+
+function renderArr(low, high, probeIdx, foundIdx) {
+  const d = document.getElementById('array-display');
+  const mr = document.getElementById('marker-row');
+  d.innerHTML = ''; mr.innerHTML = '';
+  ARR.forEach((val, idx) => {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.textContent = val;
+    if (idx === foundIdx) cell.classList.add('found');
+    else if (idx === probeIdx) cell.classList.add('probe');
+    else if (idx >= low && idx <= high) cell.classList.add('active');
+    else cell.classList.add('eliminated');
+    d.appendChild(cell);
+    const lbl = document.createElement('div');
+    lbl.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;width:48px;height:20px;font-size:10px;margin:0 3px';
+    let markers = [];
+    if (idx === low) markers.push('<span style="color:#93c5fd">L</span>');
+    if (idx === high) markers.push('<span style="color:#93c5fd">H</span>');
+    if (idx === probeIdx) markers.push('<span style="color:#FAC775">P</span>');
+    lbl.innerHTML = markers.join(' ');
+    mr.appendChild(lbl);
+  });
+}
+
+function init() {
+  clearInterval(autoTimer); autoTimer = null;
+  document.getElementById('btn-auto').textContent = 'Auto play';
+  allSteps = buildSteps(); stepIdx = 0; cmpCount = 0; updateSpeed();
+  renderArr(0, ARR.length-1, -1, -1);
+  document.getElementById('cmp-count').textContent = '0';
+  document.getElementById('low-display').textContent = '0';
+  document.getElementById('high-display').textContent = ARR.length - 1;
+  document.getElementById('probe-display').textContent = '—';
+  document.getElementById('step-label').textContent = 'Step 0';
+  document.getElementById('step-log').textContent = 'Press Step or Auto play to begin';
+  document.getElementById('btn-step').disabled = false;
+}
+
+function updateSpeed() { const v = parseInt(document.getElementById('speed').value); speedMs = 1200 - v; document.getElementById('speed-label').textContent = (v/500).toFixed(1) + '×'; }
+function setLog(msg) { const el = document.getElementById('step-log'); el.style.opacity = '0'; setTimeout(() => { el.textContent = msg; el.style.opacity = '1'; }, 120); }
+
+function applyStep(s) {
+  if (!s) return;
+  document.getElementById('step-label').textContent = 'Step ' + stepIdx;
+  if (s.type === 'initial') { renderArr(0, ARR.length-1, -1, -1); setLog('Interpolation search -estimates probe position from value distribution'); }
+  else if (s.type === 'calc-pos') {
+    document.getElementById('low-display').textContent = s.low;
+    document.getElementById('high-display').textContent = s.high;
+    document.getElementById('probe-display').textContent = s.pos;
+    document.getElementById('formula-display').textContent = 'pos = ' + s.formula;
+    renderArr(s.low, s.high, s.pos, -1);
+    setLog('Probe at index ' + s.pos + ' → arr[' + s.pos + ']=' + ARR[s.pos]);
+  }
+  else if (s.type === 'compare') {
+    cmpCount++; document.getElementById('cmp-count').textContent = cmpCount;
+    renderArr(s.low, s.high, s.pos, -1);
+    if (s.val === TARGET) setLog(s.val + ' == ' + TARGET + ' → Found!');
+    else if (s.val < TARGET) setLog(s.val + ' < ' + TARGET + ' → target is higher');
+    else setLog(s.val + ' > ' + TARGET + ' → target is lower');
+  }
+  else if (s.type === 'go-right') { renderArr(s.low, s.high, -1, -1); document.getElementById('low-display').textContent = s.low; setLog('Move low to ' + s.low); }
+  else if (s.type === 'go-left') { renderArr(s.low, s.high, -1, -1); document.getElementById('high-display').textContent = s.high; setLog('Move high to ' + s.high); }
+  else if (s.type === 'found') {
+    renderArr(s.low, s.high, -1, s.idx);
+    setLog('Found ' + TARGET + ' at index ' + s.idx + '! ' + cmpCount + ' comparisons -faster than binary for uniform data');
+    document.getElementById('step-label').textContent = 'Found ✓';
+    document.getElementById('btn-step').disabled = true;
+    clearInterval(autoTimer); autoTimer = null; document.getElementById('btn-auto').textContent = 'Auto play';
+  }
+}
+
+function stepOnce() { if (stepIdx >= allSteps.length) return; applyStep(allSteps[stepIdx]); stepIdx++; }
+function toggleAuto() { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; document.getElementById('btn-auto').textContent = 'Auto play'; } else { document.getElementById('btn-auto').textContent = 'Pause'; autoTimer = setInterval(() => { if (stepIdx >= allSteps.length) { clearInterval(autoTimer); autoTimer = null; document.getElementById('btn-auto').textContent = 'Auto play'; return; } applyStep(allSteps[stepIdx]); stepIdx++; }, speedMs); } }
+
+init();
+</script>

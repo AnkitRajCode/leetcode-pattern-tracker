@@ -6,7 +6,8 @@ import { useQuestionStore } from "@/store/questionStore";
 import SolutionDrawer from "./SolutionDrawer";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink, Youtube } from "lucide-react";
+import { ExternalLink } from "lucide-react";
+import { Youtube } from "@/components/icons/BrandIcons";
 import { Button } from "@/components/ui/button";
 
 export default function QuestionRow({

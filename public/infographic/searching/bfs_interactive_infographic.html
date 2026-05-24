@@ -1,0 +1,157 @@
+<style>
+  :root {
+    --color-text-primary: #e2e8f0;
+    --color-text-secondary: #94a3b8;
+    --color-text-info: #93c5fd;
+    --color-text-success: #6ee7b7;
+    --color-background-secondary: #0f172a;
+    --color-background-info: #1e3a5f;
+    --color-background-success: #064e3b;
+    --color-border-secondary: #334155;
+    --border-radius-md: 8px;
+  }
+  html, body { margin:0; padding:0; background:#020617; overflow:hidden; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+  .node { width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; border:2px solid var(--color-border-secondary); color:var(--color-text-primary); transition:all 0.35s; position:absolute; }
+  .node.visited { border-color:#5DCAA5; background:rgba(93,202,165,0.15); color:#6ee7b7; }
+  .node.current { border-color:#FAC775; background:rgba(250,199,117,0.2); color:#FAC775; box-shadow:0 0 10px rgba(250,199,117,0.3); }
+  .node.in-queue { border-color:#93c5fd; background:var(--color-background-info); color:#93c5fd; }
+  .edge { position:absolute; background:var(--color-border-secondary); transition:background 0.3s; }
+  .edge.traversed { background:#5DCAA5; }
+  .btn { padding:6px 16px; border-radius:var(--border-radius-md); border:0.5px solid var(--color-border-secondary); background:transparent; color:var(--color-text-primary); cursor:pointer; font-size:13px; transition:background 0.15s; }
+  .btn:hover { background:var(--color-background-secondary); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn.primary { background:var(--color-background-info); color:var(--color-text-info); border-color:transparent; }
+  .legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .step-log { font-size:12px; color:var(--color-text-secondary); min-height:20px; transition:opacity 0.3s; }
+  .queue-item { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:6px; font-size:12px; font-weight:500; margin:2px; border:1px solid var(--color-border-secondary); color:var(--color-text-primary); background:var(--color-background-secondary); }
+</style>
+
+<div style="padding:1.5rem 1rem 0">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px">
+    <div>
+      <span style="font-size:16px; font-weight:500; color:var(--color-text-primary)">Breadth-First Search (BFS)</span>
+      <span style="font-size:13px; color:var(--color-text-secondary); margin-left:8px">-explore level by level</span>
+    </div>
+    <span id="step-label" style="font-size:12px; color:var(--color-text-secondary)">Step 0</span>
+  </div>
+
+  <div style="display:flex; gap:14px; margin-bottom:16px; flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:rgba(250,199,117,0.2);border:2px solid #FAC775"></span>Current</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:var(--color-background-info);border:2px solid #93c5fd"></span>In queue</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:rgba(93,202,165,0.15);border:2px solid #5DCAA5"></span>Visited</span>
+  </div>
+
+  <div style="display:flex; gap:16px; flex-wrap:wrap">
+    <div style="flex:2; min-width:280px">
+      <div id="graph" style="position:relative; height:200px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); margin-bottom:10px"></div>
+    </div>
+    <div style="flex:1; min-width:120px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:6px">Queue (FIFO)</div>
+      <div id="queue-display" style="min-height:60px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:8px; display:flex; flex-wrap:wrap; align-content:flex-start; gap:2px"></div>
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-top:10px; margin-bottom:4px">Visit order</div>
+      <div id="order-display" style="font-size:13px; font-weight:500; color:var(--color-text-success)">—</div>
+    </div>
+  </div>
+
+  <div id="step-log" class="step-log" style="margin-bottom:14px; text-align:center"></div>
+
+  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+    <button class="btn primary" id="btn-step" onclick="stepOnce()">Step →</button>
+    <button class="btn" id="btn-auto" onclick="toggleAuto()">Auto play</button>
+    <button class="btn" id="btn-reset" onclick="init()">Reset</button>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:8px; font-size:12px; color:var(--color-text-secondary)">
+      Speed <input type="range" id="speed" min="100" max="900" value="400" step="100" style="width:80px" oninput="updateSpeed()">
+      <span id="speed-label">0.8×</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const ADJ = [[1,2],[0,3,4],[0,5,6],[1],[1],[2],[2]];
+const LABELS = ['A','B','C','D','E','F','G'];
+const POS = [[50,10],[25,40],[75,40],[10,75],[40,75],[60,75],[90,75]];
+const EDGES = [[0,1],[0,2],[1,3],[1,4],[2,5],[2,6]];
+
+let allSteps, stepIdx, autoTimer, speedMs;
+
+function buildSteps() {
+  const steps = [{type:'initial',queue:[0],visited:new Set([0])}];
+  const visited = new Set([0]), queue = [0], order = [];
+  while (queue.length > 0) {
+    const node = queue.shift();
+    order.push(node);
+    steps.push({type:'dequeue',node,queue:[...queue],visited:new Set(visited),order:[...order]});
+    const newNeighbors = [];
+    for (const n of ADJ[node]) {
+      if (!visited.has(n)) { visited.add(n); queue.push(n); newNeighbors.push(n); }
+    }
+    steps.push({type:'enqueue',node,queue:[...queue],visited:new Set(visited),order:[...order],neighbors:newNeighbors});
+  }
+  steps.push({type:'done',visited:new Set(visited),order:[...order]});
+  return steps;
+}
+
+function drawGraph(currentNode, visitedSet, queueSet) {
+  const g = document.getElementById('graph');
+  const w = g.offsetWidth || 320, h = 200;
+  g.innerHTML = '';
+  EDGES.forEach(([a,b]) => {
+    const x1=POS[a][0]*w/100, y1=POS[a][1]*h/100+18;
+    const x2=POS[b][0]*w/100, y2=POS[b][1]*h/100+18;
+    const len = Math.sqrt((x2-x1)**2+(y2-y1)**2);
+    const angle = Math.atan2(y2-y1,x2-x1)*180/Math.PI;
+    const edge = document.createElement('div');
+    edge.className = 'edge';
+    if (visitedSet.has(a)&&visitedSet.has(b)) edge.classList.add('traversed');
+    edge.style.cssText = `width:${len}px;height:2px;left:${x1}px;top:${y1}px;transform-origin:0 0;transform:rotate(${angle}deg)`;
+    g.appendChild(edge);
+  });
+  LABELS.forEach((label, idx) => {
+    const node = document.createElement('div');
+    node.className = 'node';
+    node.textContent = label;
+    node.style.left = (POS[idx][0]*w/100 - 18) + 'px';
+    node.style.top = (POS[idx][1]*h/100) + 'px';
+    if (idx === currentNode) node.classList.add('current');
+    else if (visitedSet.has(idx) && !queueSet.has(idx)) node.classList.add('visited');
+    else if (queueSet.has(idx)) node.classList.add('in-queue');
+    g.appendChild(node);
+  });
+}
+
+function renderQueue(queue) {
+  const d = document.getElementById('queue-display');
+  d.innerHTML = queue.length === 0 ? '<span style="color:var(--color-text-secondary);font-size:11px">empty</span>' :
+    queue.map(n => '<span class="queue-item">' + LABELS[n] + '</span>').join('');
+}
+function renderOrder(order) { document.getElementById('order-display').textContent = order.length === 0 ? '—' : order.map(n=>LABELS[n]).join(' → '); }
+
+function init() {
+  clearInterval(autoTimer); autoTimer = null;
+  document.getElementById('btn-auto').textContent = 'Auto play';
+  allSteps = buildSteps(); stepIdx = 0; updateSpeed();
+  drawGraph(-1, new Set(), new Set([0]));
+  renderQueue([0]); renderOrder([]);
+  document.getElementById('step-label').textContent = 'Step 0';
+  document.getElementById('step-log').textContent = 'BFS from node A -uses queue (FIFO)';
+  document.getElementById('btn-step').disabled = false;
+}
+
+function updateSpeed() { const v = parseInt(document.getElementById('speed').value); speedMs = 1200 - v; document.getElementById('speed-label').textContent = (v/500).toFixed(1) + '×'; }
+function setLog(msg) { const el = document.getElementById('step-log'); el.style.opacity = '0'; setTimeout(() => { el.textContent = msg; el.style.opacity = '1'; }, 120); }
+
+function applyStep(s) {
+  if (!s) return;
+  document.getElementById('step-label').textContent = 'Step ' + stepIdx;
+  const queueSet = new Set(s.queue || []);
+  if (s.type === 'initial') { drawGraph(-1, new Set(), queueSet); renderQueue(s.queue); setLog('Start: enqueue A, mark visited'); }
+  else if (s.type === 'dequeue') { drawGraph(s.node, s.visited, queueSet); renderQueue(s.queue); renderOrder(s.order); setLog('Dequeue ' + LABELS[s.node] + ' -process it'); }
+  else if (s.type === 'enqueue') { drawGraph(s.node, s.visited, queueSet); renderQueue(s.queue); setLog('Enqueue unvisited neighbors of ' + LABELS[s.node] + ': ' + (s.neighbors.length > 0 ? s.neighbors.map(n=>LABELS[n]).join(', ') : 'none')); }
+  else if (s.type === 'done') { drawGraph(-1, s.visited, new Set()); renderOrder(s.order); setLog('BFS complete! Level-order: ' + s.order.map(n=>LABELS[n]).join(' → ')); document.getElementById('step-label').textContent = 'Done ✓'; document.getElementById('btn-step').disabled = true; clearInterval(autoTimer); autoTimer = null; document.getElementById('btn-auto').textContent = 'Auto play'; }
+}
+
+function stepOnce() { if (stepIdx >= allSteps.length) return; applyStep(allSteps[stepIdx]); stepIdx++; }
+function toggleAuto() { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; document.getElementById('btn-auto').textContent = 'Auto play'; } else { document.getElementById('btn-auto').textContent = 'Pause'; autoTimer = setInterval(() => { if (stepIdx >= allSteps.length) { clearInterval(autoTimer); autoTimer = null; document.getElementById('btn-auto').textContent = 'Auto play'; return; } applyStep(allSteps[stepIdx]); stepIdx++; }, speedMs); } }
+
+init();
+</script>

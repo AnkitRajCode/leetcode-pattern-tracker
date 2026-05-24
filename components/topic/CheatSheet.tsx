@@ -47,21 +47,46 @@ const cheatSheetData: Record<string, CheatSheetCard[]> = {
     ],
     strings: [
         {
-            title: "String Patterns",
-            icon: <Hash size={18} />,
+            title: "Pattern Matching",
+            icon: <Search size={18} />,
             color: "blue",
             items: [
-                { label: "KMP Algorithm", desc: "Substr search, O(n+m)" },
-                { label: "Rabin-Karp", desc: "Hashing, O(n+m)" }
+                { label: "KMP Algorithm", desc: "LPS array, O(n+m) substring search" },
+                { label: "Rabin-Karp", desc: "Rolling hash, O(n+m) avg, good for multiple patterns" },
+                { label: "Z-Algorithm", desc: "Z-array for pattern occurrences in O(n+m)" }
             ]
         },
         {
-            title: "Manipulations",
+            title: "Two Pointers / Sliding Window",
             icon: <MousePointer2 size={18} />,
             color: "emerald",
             items: [
-                { label: "Anagrams", desc: "Freq map/Sorting" },
-                { label: "Palindromes", desc: "Two pointers" }
+                { label: "Palindrome Check", desc: "left/right pointers moving inward" },
+                { label: "Longest Substring (No Repeat)", desc: "Sliding window + HashSet" },
+                { label: "Minimum Window Substring", desc: "Expand right, shrink left, freq map" },
+                { label: "Anagram Detection", desc: "Fixed-size window + char frequency" }
+            ]
+        },
+        {
+            title: "HashMap / Frequency",
+            icon: <Hash size={18} />,
+            color: "indigo",
+            items: [
+                { label: "Valid Anagram", desc: "int[26] freq count comparison" },
+                { label: "Group Anagrams", desc: "Sorted string as key → HashMap grouping" },
+                { label: "First Unique Char", desc: "Frequency array + single pass" },
+                { label: "Ransom Note", desc: "Freq count of available chars" }
+            ]
+        },
+        {
+            title: "DP & Stack",
+            icon: <Cpu size={18} />,
+            color: "rose",
+            items: [
+                { label: "Longest Palindromic Substring", desc: "Expand around center or dp[i][j]" },
+                { label: "Edit Distance", desc: "Insert/delete/replace, dp[i][j]" },
+                { label: "Valid Parentheses", desc: "Stack: push open, pop on close" },
+                { label: "Decode String", desc: "Stack of [string, count] pairs" }
             ]
         }
     ],

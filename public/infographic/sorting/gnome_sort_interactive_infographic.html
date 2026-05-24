@@ -1,0 +1,173 @@
+<style>
+  :root {
+    --color-text-primary: #e2e8f0;
+    --color-text-secondary: #94a3b8;
+    --color-text-info: #93c5fd;
+    --color-text-success: #6ee7b7;
+    --color-background-secondary: #0f172a;
+    --color-background-info: #1e3a5f;
+    --color-border-secondary: #334155;
+    --border-radius-md: 8px;
+  }
+  html, body { margin:0; padding:0; background:#020617; overflow:hidden; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+  .bar { transition: left 0.4s cubic-bezier(.4,0,.2,1), background 0.3s, box-shadow 0.3s; position:absolute; border-radius:6px 6px 0 0; display:flex; align-items:flex-start; justify-content:center; padding-top:5px; font-weight:500; font-size:11px; cursor:default; user-select:none; }
+  .bar.current { background:#AFA9EC !important; box-shadow:0 0 0 2px #534AB7; }
+  .bar.comparing { background:#7F77DD !important; box-shadow:0 0 0 2px #534AB7; }
+  .bar.swapping { background:#FAC775 !important; box-shadow:0 0 0 2px #EF9F27; }
+  .bar.sorted { background:#5DCAA5 !important; box-shadow:0 0 0 2px #0F6E56; }
+  .gnome-marker { position:absolute; bottom:-24px; font-size:16px; text-align:center; transition:left 0.4s; }
+  .btn { padding:6px 16px; border-radius:var(--border-radius-md); border:0.5px solid var(--color-border-secondary); background:transparent; color:var(--color-text-primary); cursor:pointer; font-size:13px; transition:background 0.15s; }
+  .btn:hover { background:var(--color-background-secondary); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn.primary { background:var(--color-background-info); color:var(--color-text-info); border-color:transparent; }
+  .legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .step-log { font-size:12px; color:var(--color-text-secondary); min-height:20px; transition:opacity 0.3s; }
+</style>
+
+<div style="padding:1.5rem 1rem 0">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px">
+    <div>
+      <span style="font-size:16px; font-weight:500; color:var(--color-text-primary)">Gnome sort</span>
+      <span style="font-size:13px; color:var(--color-text-secondary); margin-left:8px">-"stupid sort" / garden gnome algorithm</span>
+    </div>
+    <span id="step-label" style="font-size:12px; color:var(--color-text-secondary)">Step 0</span>
+  </div>
+
+  <div style="display:flex; gap:14px; margin-bottom:20px; flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#AFA9EC"></span>Current (gnome)</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#7F77DD"></span>Comparing</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#FAC775"></span>Swapping</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#5DCAA5"></span>Sorted</span>
+  </div>
+
+  <div id="stage" style="position:relative; height:140px; margin-bottom:28px"></div>
+  <div id="index-row" style="display:flex; justify-content:space-around; margin-bottom:16px; padding:0 4px"></div>
+  <div id="step-log" class="step-log" style="margin-bottom:14px; text-align:center"></div>
+
+  <div style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap">
+    <div style="flex:1; min-width:100px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:3px">Swaps</div>
+      <div id="swap-count" style="font-size:20px; font-weight:500; color:var(--color-text-primary)">0</div>
+    </div>
+    <div style="flex:1; min-width:100px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:3px">Position</div>
+      <div id="pos-display" style="font-size:20px; font-weight:500; color:var(--color-text-info)">0</div>
+    </div>
+    <div style="flex:2; min-width:160px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:3px">Key insight</div>
+      <div style="font-size:12px; font-weight:500; color:var(--color-text-secondary)">Like a gnome sorting flower pots -move back on disorder, forward when ordered</div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+    <button class="btn primary" id="btn-step" onclick="stepOnce()">Step →</button>
+    <button class="btn" id="btn-auto" onclick="toggleAuto()">Auto play</button>
+    <button class="btn" id="btn-reset" onclick="init()">Reset</button>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:8px; font-size:12px; color:var(--color-text-secondary)">
+      Speed <input type="range" id="speed" min="100" max="900" value="500" step="100" style="width:80px" oninput="updateSpeed()">
+      <span id="speed-label">1.0×</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const VALS = [72, 38, 91, 55, 18, 67, 44];
+let arr, allSteps, stepIdx, autoTimer, speedMs, swapCount;
+
+function barHeight(val){const mn=Math.min(...VALS),mx=Math.max(...VALS);return 30+Math.round((val-mn)/(mx-mn)*85);}
+function barColor(val){const mn=Math.min(...VALS),mx=Math.max(...VALS),t=(val-mn)/(mx-mn);return `hsl(${210+t*30},${30+t*20}%,${48+t*18}%)`;}
+
+function buildSteps(startArr) {
+  const a=[...startArr], n=a.length, steps=[];
+  let pos=0;
+  steps.push({type:'initial',arr:[...a],pos:0});
+  pos=1;
+
+  while(pos<n) {
+    if(pos===0) {
+      pos++;
+      steps.push({type:'move-forward',arr:[...a],pos,msg:'At start → move forward'});
+    } else if(a[pos]>=a[pos-1]) {
+      steps.push({type:'compare-ok',arr:[...a],pos,prev:pos-1,msg:'['+pos+']='+a[pos]+' >= ['+(pos-1)+']='+a[pos-1]+' → move forward'});
+      pos++;
+      if(pos<n) steps.push({type:'advance',arr:[...a],pos});
+    } else {
+      steps.push({type:'compare-bad',arr:[...a],pos,prev:pos-1,msg:'['+pos+']='+a[pos]+' < ['+(pos-1)+']='+a[pos-1]+' → swap & step back'});
+      [a[pos],a[pos-1]]=[a[pos-1],a[pos]];
+      steps.push({type:'swap',arr:[...a],pos,prev:pos-1});
+      pos--;
+      if(pos===0) {
+        pos=1;
+        steps.push({type:'move-forward',arr:[...a],pos,msg:'Back to 0 → jump forward'});
+      }
+    }
+  }
+  steps.push({type:'done',arr:[...a]});
+  return steps;
+}
+
+function renderArr(a, currentPos, comparePos, swapPair, done) {
+  const stage=document.getElementById('stage'),indexRow=document.getElementById('index-row');
+  const n=a.length,stageW=stage.offsetWidth||600,slotW=Math.floor(stageW/n),barW=Math.min(slotW-8,50);
+  stage.innerHTML='';indexRow.innerHTML='';
+  a.forEach((val,idx)=>{
+    const h=barHeight(val),el=document.createElement('div');
+    el.className='bar';el.style.width=barW+'px';el.style.height=h+'px';
+    el.style.left=(slotW*idx+(slotW-barW)/2)+'px';el.style.bottom='0';
+    el.style.background=barColor(val);el.style.color='#e2e8f0';el.textContent=val;
+    if(done)el.classList.add('sorted');
+    else if(swapPair&&(idx===swapPair[0]||idx===swapPair[1]))el.classList.add('swapping');
+    else if(idx===comparePos)el.classList.add('comparing');
+    else if(idx===currentPos)el.classList.add('current');
+    stage.appendChild(el);
+    const lbl=document.createElement('div');
+    lbl.style.cssText='width:'+slotW+'px;text-align:center;font-size:10px;color:var(--color-text-secondary)';
+    lbl.textContent=idx;indexRow.appendChild(lbl);
+  });
+  // Gnome marker
+  if(!done && currentPos>=0 && currentPos<n) {
+    const marker=document.createElement('div');
+    marker.className='gnome-marker';
+    marker.style.left=(slotW*currentPos+(slotW-barW)/2)+'px';
+    marker.style.width=barW+'px';
+    marker.textContent='🌱';
+    stage.appendChild(marker);
+  }
+}
+
+function init(){
+  clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';
+  arr=[...VALS];swapCount=0;
+  allSteps=buildSteps([...VALS]);stepIdx=0;updateSpeed();
+  renderArr(arr,0,-1,null,false);
+  document.getElementById('swap-count').textContent='0';
+  document.getElementById('pos-display').textContent='0';
+  document.getElementById('step-label').textContent='Step 0';
+  document.getElementById('step-log').textContent='Press Step or Auto play to begin';
+  document.getElementById('btn-step').disabled=false;
+}
+
+function updateSpeed(){const v=parseInt(document.getElementById('speed').value);speedMs=1050-v;document.getElementById('speed-label').textContent=(v/500).toFixed(1)+'×';}
+function setLog(msg){const el=document.getElementById('step-log');el.style.opacity='0';setTimeout(()=>{el.textContent=msg;el.style.opacity='1';},120);}
+
+function applyStep(s){
+  if(!s)return;
+  document.getElementById('step-label').textContent='Step '+stepIdx;
+  arr=[...s.arr];
+  const pos=s.pos!==undefined?s.pos:0;
+  document.getElementById('pos-display').textContent=pos;
+
+  if(s.type==='initial'){renderArr(s.arr,0,-1,null,false);setLog('Array: ['+s.arr.join(', ')+'] -gnome starts at pos 1');}
+  else if(s.type==='compare-ok'){renderArr(s.arr,s.pos,s.prev,null,false);setLog(s.msg);}
+  else if(s.type==='compare-bad'){renderArr(s.arr,s.pos,s.prev,null,false);setLog(s.msg);}
+  else if(s.type==='swap'){swapCount++;document.getElementById('swap-count').textContent=swapCount;renderArr(s.arr,s.pos,[s.pos,s.prev],[s.pos,s.prev],false);setLog('Swapped! Array: ['+s.arr.join(', ')+']');}
+  else if(s.type==='advance'){renderArr(s.arr,s.pos,-1,null,false);setLog('Gnome moves to position '+s.pos);}
+  else if(s.type==='move-forward'){renderArr(s.arr,s.pos,-1,null,false);setLog(s.msg);}
+  else if(s.type==='done'){renderArr(s.arr,-1,-1,null,true);setLog('Sorted! '+swapCount+' swaps -O(n²) but simple & adaptive');document.getElementById('step-label').textContent='Done ✓';document.getElementById('btn-step').disabled=true;clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';}
+}
+
+function stepOnce(){if(stepIdx>=allSteps.length)return;applyStep(allSteps[stepIdx]);stepIdx++;}
+function toggleAuto(){if(autoTimer){clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';}else{document.getElementById('btn-auto').textContent='Pause';autoTimer=setInterval(()=>{if(stepIdx>=allSteps.length){clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';return;}applyStep(allSteps[stepIdx]);stepIdx++;},speedMs);}}
+
+init();
+</script>

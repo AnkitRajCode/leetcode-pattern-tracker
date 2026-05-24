@@ -2,15 +2,16 @@
 
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@/components/ui/button";
-import { LogIn, LogOut, User as UserIcon, ServerCog } from "lucide-react";
+import { LogIn, LogOut, User as UserIcon, ServerCog, Binary } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
 interface UserNavProps {
     onOpenSystemDesign?: () => void;
+    onOpenAlgorithms?: () => void;
 }
 
-export default function UserNav({ onOpenSystemDesign }: UserNavProps) {
+export default function UserNav({ onOpenSystemDesign, onOpenAlgorithms }: UserNavProps) {
     const { user, signInWithGoogle, logout, loading } = useAuth();
 
     if (loading) {
@@ -51,7 +52,7 @@ export default function UserNav({ onOpenSystemDesign }: UserNavProps) {
                 </div>
             </Link>
 
-            {/* System Design Notes — only visible when signed in */}
+            {/* System Design Notes -only visible when signed in */}
             {onOpenSystemDesign && (
                 <button
                     id="system-design-btn"
@@ -61,6 +62,19 @@ export default function UserNav({ onOpenSystemDesign }: UserNavProps) {
                     aria-label="Open System Design Notes"
                 >
                     <ServerCog size={20} />
+                </button>
+            )}
+
+            {/* Algorithms Notes */}
+            {onOpenAlgorithms && (
+                <button
+                    id="algorithms-btn"
+                    onClick={onOpenAlgorithms}
+                    title="Searching & Sorting Algorithms"
+                    className="p-2.5 cursor-pointer rounded-xl bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:bg-emerald-500 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-white transition-all duration-300 hover:-translate-y-0.5 shadow-sm border border-slate-200 dark:border-slate-800"
+                    aria-label="Open Algorithms Notes"
+                >
+                    <Binary size={20} />
                 </button>
             )}
 

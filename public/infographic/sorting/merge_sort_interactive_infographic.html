@@ -1,0 +1,205 @@
+<style>
+  :root {
+    --color-text-primary: #e2e8f0;
+    --color-text-secondary: #94a3b8;
+    --color-text-info: #93c5fd;
+    --color-text-success: #6ee7b7;
+    --color-background-secondary: #0f172a;
+    --color-background-info: #1e3a5f;
+    --color-background-success: #064e3b;
+    --color-border-secondary: #334155;
+    --color-border-tertiary: #475569;
+    --color-border-success: #065f46;
+    --border-radius-md: 8px;
+  }
+  html, body { margin:0; padding:0; background:#020617; overflow:hidden; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+  .cell { display:inline-flex; align-items:center; justify-content:center; width:38px; height:32px; border-radius:6px; font-size:13px; font-weight:500; margin:2px; transition:all 0.3s; }
+  .cell.left { background:#7F77DD; color:#fff; }
+  .cell.right { background:#EF9F27; color:#fff; }
+  .cell.merged { background:#5DCAA5; color:#1e293b; }
+  .cell.idle { background:#334155; color:#94a3b8; }
+  .level { margin-bottom:12px; padding:8px 12px; border-radius:8px; background:var(--color-background-secondary); }
+  .level-label { font-size:10px; color:var(--color-text-secondary); margin-bottom:4px; font-weight:500; }
+  .btn { padding:6px 16px; border-radius:var(--border-radius-md); border:0.5px solid var(--color-border-secondary); background:transparent; color:var(--color-text-primary); cursor:pointer; font-size:13px; transition:background 0.15s; }
+  .btn:hover { background:var(--color-background-secondary); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn.primary { background:var(--color-background-info); color:var(--color-text-info); border-color:transparent; }
+  .btn.primary:hover { opacity:0.85; }
+  .legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .step-log { font-size:12px; color:var(--color-text-secondary); min-height:20px; transition:opacity 0.3s; }
+</style>
+
+<div style="padding:1.5rem 1rem 0">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px">
+    <div>
+      <span style="font-size:16px; font-weight:500; color:var(--color-text-primary)">Merge sort</span>
+      <span style="font-size:13px; color:var(--color-text-secondary); margin-left:8px">-divide, conquer, merge</span>
+    </div>
+    <span id="step-label" style="font-size:12px; color:var(--color-text-secondary)">Step 0</span>
+  </div>
+
+  <div style="display:flex; gap:14px; margin-bottom:16px; flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#7F77DD"></span>Left half</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#EF9F27"></span>Right half</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#5DCAA5"></span>Merged</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#334155"></span>Waiting</span>
+  </div>
+
+  <div id="tree-view" style="margin-bottom:16px; min-height:200px"></div>
+  <div id="step-log" class="step-log" style="margin-bottom:16px; text-align:center; min-height:18px"></div>
+
+  <div style="display:flex; gap:16px; margin-bottom:20px; flex-wrap:wrap">
+    <div style="flex:1; min-width:140px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:12px 16px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:4px">Merge operations</div>
+      <div id="merge-count" style="font-size:22px; font-weight:500; color:var(--color-text-primary)">0</div>
+    </div>
+    <div style="flex:1; min-width:140px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:12px 16px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:4px">Comparisons</div>
+      <div id="cmp-count" style="font-size:22px; font-weight:500; color:var(--color-text-primary)">0</div>
+    </div>
+    <div style="flex:2; min-width:200px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:12px 16px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:4px">Key insight</div>
+      <div style="font-size:13px; font-weight:500; color:var(--color-text-secondary)">O(n log n) always -divide into halves, merge sorted halves</div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+    <button class="btn primary" id="btn-step" onclick="stepOnce()">Step →</button>
+    <button class="btn" id="btn-auto" onclick="toggleAuto()">Auto play</button>
+    <button class="btn" id="btn-reset" onclick="init()">Reset</button>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:8px; font-size:12px; color:var(--color-text-secondary)">
+      Speed
+      <input type="range" id="speed" min="100" max="900" value="400" step="100" style="width:80px" oninput="updateSpeed()">
+      <span id="speed-label">0.8×</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const VALS = [72, 38, 91, 55, 18, 67, 44];
+let allSteps, stepIdx, autoTimer, speedMs, mergeCount, cmpCount;
+
+function buildSteps(arr) {
+  const steps = [];
+  function ms(a, l, r) {
+    if (l >= r) return;
+    const m = Math.floor((l + r) / 2);
+    steps.push({type:'split', arr:[...a], l, m, r});
+    ms(a, l, m);
+    ms(a, m + 1, r);
+    // merge
+    const left = a.slice(l, m + 1), right = a.slice(m + 1, r + 1);
+    steps.push({type:'merge-start', arr:[...a], l, m, r, left:[...left], right:[...right]});
+    let i = 0, j = 0, k = l, comparisons = 0;
+    while (i < left.length && j < right.length) {
+      comparisons++;
+      if (left[i] <= right[j]) { a[k] = left[i]; i++; }
+      else { a[k] = right[j]; j++; }
+      k++;
+    }
+    while (i < left.length) { a[k] = left[i]; i++; k++; }
+    while (j < right.length) { a[k] = right[j]; j++; k++; }
+    steps.push({type:'merge-done', arr:[...a], l, r, comparisons});
+  }
+  steps.push({type:'initial', arr:[...arr]});
+  ms([...arr], 0, arr.length - 1);
+  steps.push({type:'done', arr:steps[steps.length-1]?.arr || arr});
+  return steps;
+}
+
+function renderTree(steps, currentIdx) {
+  const container = document.getElementById('tree-view');
+  container.innerHTML = '';
+  
+  // Show current state as levels of decomposition
+  const s = steps[Math.min(currentIdx, steps.length - 1)];
+  if (!s) return;
+
+  // Show current array state
+  const div = document.createElement('div');
+  div.className = 'level';
+  div.innerHTML = '<div class="level-label">Current array state</div><div>' +
+    s.arr.map((v, idx) => {
+      let cls = 'idle';
+      if (s.type === 'split') {
+        if (idx >= s.l && idx <= s.m) cls = 'left';
+        else if (idx > s.m && idx <= s.r) cls = 'right';
+      } else if (s.type === 'merge-start') {
+        if (idx >= s.l && idx <= s.m) cls = 'left';
+        else if (idx > s.m && idx <= s.r) cls = 'right';
+      } else if (s.type === 'merge-done') {
+        if (idx >= s.l && idx <= s.r) cls = 'merged';
+      } else if (s.type === 'done') {
+        cls = 'merged';
+      }
+      return '<span class="cell ' + cls + '">' + v + '</span>';
+    }).join('') + '</div>';
+  container.appendChild(div);
+
+  // Show subarrays if splitting/merging
+  if (s.type === 'merge-start') {
+    const subDiv = document.createElement('div');
+    subDiv.className = 'level';
+    subDiv.innerHTML = '<div class="level-label">Merging</div>' +
+      '<span style="font-size:12px;color:#7F77DD;margin-right:12px">L: [' + s.left.join(', ') + ']</span>' +
+      '<span style="font-size:12px;color:#EF9F27">R: [' + s.right.join(', ') + ']</span>';
+    container.appendChild(subDiv);
+  }
+}
+
+function init() {
+  clearInterval(autoTimer); autoTimer = null;
+  document.getElementById('btn-auto').textContent = 'Auto play';
+  allSteps = buildSteps([...VALS]);
+  stepIdx = 0; mergeCount = 0; cmpCount = 0; updateSpeed();
+  document.getElementById('merge-count').textContent = '0';
+  document.getElementById('cmp-count').textContent = '0';
+  document.getElementById('step-label').textContent = 'Step 0';
+  document.getElementById('step-log').textContent = 'Press Step or Auto play to begin';
+  document.getElementById('btn-step').disabled = false;
+  renderTree(allSteps, 0);
+}
+
+function updateSpeed() {
+  const v = parseInt(document.getElementById('speed').value);
+  speedMs = 1200 - v;
+  document.getElementById('speed-label').textContent = (v/500).toFixed(1) + '×';
+}
+
+function setLog(msg) {
+  const el = document.getElementById('step-log');
+  el.style.opacity = '0';
+  setTimeout(() => { el.textContent = msg; el.style.opacity = '1'; }, 120);
+}
+
+function applyStep(s) {
+  if (!s) return;
+  document.getElementById('step-label').textContent = 'Step ' + stepIdx;
+  renderTree(allSteps, stepIdx);
+
+  if (s.type === 'initial') setLog('Array: [' + s.arr.join(', ') + '] -begin divide & conquer');
+  else if (s.type === 'split') setLog('Split [' + s.l + '..' + s.r + '] → left [' + s.l + '..' + s.m + '], right [' + (s.m+1) + '..' + s.r + ']');
+  else if (s.type === 'merge-start') setLog('Merge: [' + s.left.join(',') + '] + [' + s.right.join(',') + ']');
+  else if (s.type === 'merge-done') {
+    mergeCount++; document.getElementById('merge-count').textContent = mergeCount;
+    cmpCount += s.comparisons; document.getElementById('cmp-count').textContent = cmpCount;
+    setLog('Merged [' + s.l + '..' + s.r + '] → [' + s.arr.slice(s.l, s.r+1).join(', ') + '] (' + s.comparisons + ' comparisons)');
+  }
+  else if (s.type === 'done') {
+    setLog('Fully sorted! ' + mergeCount + ' merges, ' + cmpCount + ' comparisons -O(n log n)');
+    document.getElementById('step-label').textContent = 'Done ✓';
+    document.getElementById('btn-step').disabled = true;
+    clearInterval(autoTimer); autoTimer = null;
+    document.getElementById('btn-auto').textContent = 'Auto play';
+  }
+}
+
+function stepOnce() { if (stepIdx >= allSteps.length) return; applyStep(allSteps[stepIdx]); stepIdx++; }
+
+function toggleAuto() {
+  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; document.getElementById('btn-auto').textContent = 'Auto play'; }
+  else { document.getElementById('btn-auto').textContent = 'Pause'; autoTimer = setInterval(() => { if (stepIdx >= allSteps.length) { clearInterval(autoTimer); autoTimer = null; document.getElementById('btn-auto').textContent = 'Auto play'; return; } applyStep(allSteps[stepIdx]); stepIdx++; }, speedMs); }
+}
+
+init();
+</script>

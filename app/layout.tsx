@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   ],
 
   authors: [
-    { name: "Ankit Raj", url: "https://ankitraj.pages.dev/" }
+    { name: "Ankit Raj", url: "https://ankitrajcode.in/" }
   ],
 
   creator: "Ankit Raj",
@@ -122,6 +122,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
         <AuthProvider>
           <FirebaseSync />

@@ -1,0 +1,225 @@
+<style>
+  :root {
+    --color-text-primary: #e2e8f0;
+    --color-text-secondary: #94a3b8;
+    --color-text-info: #93c5fd;
+    --color-text-success: #6ee7b7;
+    --color-background-secondary: #0f172a;
+    --color-background-info: #1e3a5f;
+    --color-background-success: #064e3b;
+    --color-border-secondary: #334155;
+    --color-border-tertiary: #475569;
+    --color-border-success: #065f46;
+    --border-radius-md: 8px;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #020617;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  @keyframes slide-in { 0%{transform:translateX(20px);opacity:0} 100%{transform:translateX(0);opacity:1} }
+  @keyframes shift-right { 0%{transform:translateX(0)} 100%{transform:translateX(var(--shift))} }
+  @keyframes insert-glow { 0%,100%{box-shadow:0 0 0 2px #0F6E56} 50%{box-shadow:0 0 8px 3px #5DCAA5} }
+  .bar { transition: left 0.4s cubic-bezier(.4,0,.2,1), background 0.3s, box-shadow 0.3s; position:absolute; border-radius:6px 6px 0 0; display:flex; align-items:flex-start; justify-content:center; padding-top:6px; font-weight:500; font-size:12px; cursor:default; user-select:none; }
+  .bar.sorted { box-shadow: 0 0 0 2.5px #0F6E56; background: #5DCAA5 !important; }
+  .bar.key { box-shadow: 0 0 0 2.5px #EF9F27; background: #FAC775 !important; }
+  .bar.shifting { box-shadow: 0 0 0 2px #7F77DD; background: #AFA9EC !important; }
+  .bar.inserted { animation: insert-glow 0.5s ease-in-out; }
+  .btn { padding:6px 16px; border-radius:var(--border-radius-md); border:0.5px solid var(--color-border-secondary); background:transparent; color:var(--color-text-primary); cursor:pointer; font-size:13px; transition:background 0.15s; }
+  .btn:hover { background:var(--color-background-secondary); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn.primary { background:var(--color-background-info); color:var(--color-text-info); border-color:transparent; }
+  .btn.primary:hover { opacity:0.85; }
+  .legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .step-log { font-size:12px; color:var(--color-text-secondary); min-height:20px; transition:opacity 0.3s; }
+</style>
+
+<div style="padding:1.5rem 1rem 0">
+
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px">
+    <div>
+      <span style="font-size:16px; font-weight:500; color:var(--color-text-primary)">Insertion sort</span>
+      <span style="font-size:13px; color:var(--color-text-secondary); margin-left:8px">-pick a card, insert it in the right place</span>
+    </div>
+    <span id="pass-label" style="font-size:12px; color:var(--color-text-secondary)">Pass 0 of 0</span>
+  </div>
+
+  <div style="display:flex; gap:14px; margin-bottom:20px; flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#FAC775;box-shadow:0 0 0 2px #EF9F27"></span>Key (to insert)</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#AFA9EC;box-shadow:0 0 0 2px #7F77DD"></span>Shifting right</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#5DCAA5;box-shadow:0 0 0 2px #0F6E56"></span>Sorted region</span>
+  </div>
+
+  <div id="stage" style="position:relative; height:140px; margin-bottom:8px"></div>
+  <div id="index-row" style="display:flex; justify-content:space-around; margin-bottom:16px; padding:0 4px"></div>
+  <div id="step-log" class="step-log" style="margin-bottom:16px; text-align:center; min-height:18px"></div>
+
+  <div style="display:flex; gap:16px; margin-bottom:20px; flex-wrap:wrap">
+    <div style="flex:1; min-width:140px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:12px 16px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:4px">Shifts</div>
+      <div id="shift-count" style="font-size:22px; font-weight:500; color:var(--color-text-primary)">0</div>
+    </div>
+    <div style="flex:1; min-width:140px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:12px 16px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:4px">Comparisons</div>
+      <div id="cmp-count" style="font-size:22px; font-weight:500; color:var(--color-text-primary)">0</div>
+    </div>
+    <div style="flex:2; min-width:200px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:12px 16px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:4px">Key insight</div>
+      <div id="opt-status" style="font-size:13px; font-weight:500; color:var(--color-text-secondary)">Best for nearly-sorted arrays -O(n) best case</div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+    <button class="btn primary" id="btn-step" onclick="stepOnce()">Step →</button>
+    <button class="btn" id="btn-auto" onclick="toggleAuto()">Auto play</button>
+    <button class="btn" id="btn-reset" onclick="init()">Reset</button>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:8px; font-size:12px; color:var(--color-text-secondary)">
+      Speed
+      <input type="range" id="speed" min="100" max="900" value="500" step="100" style="width:80px" oninput="updateSpeed()">
+      <span id="speed-label">1.0×</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const VALS = [72, 38, 91, 55, 18, 67, 44];
+let arr, allSteps, stepIdx, autoTimer, speedMs, shiftCount, cmpCount;
+
+function barHeight(val) {
+  const mn = Math.min(...VALS), mx = Math.max(...VALS);
+  return 30 + Math.round((val - mn) / (mx - mn) * 90);
+}
+
+function barColor(val) {
+  const mn = Math.min(...VALS), mx = Math.max(...VALS);
+  const t = (val - mn) / (mx - mn);
+  return `hsl(${210 + t * 30}, ${35 + t * 15}%, ${50 + t * 15}%)`;
+}
+
+function buildSteps(startArr) {
+  const a = [...startArr], n = a.length, steps = [];
+  steps.push({type:'initial', arr:[...a], sorted:1});
+  for (let i = 1; i < n; i++) {
+    const key = a[i];
+    steps.push({type:'pick-key', i, key, arr:[...a], sorted:i});
+    let j = i - 1;
+    while (j >= 0 && a[j] > key) {
+      steps.push({type:'shift', i, j, key, arr:[...a], sorted:i});
+      a[j + 1] = a[j];
+      j--;
+      steps.push({type:'after-shift', i, j:j+1, key, arr:[...a], sorted:i});
+    }
+    a[j + 1] = key;
+    steps.push({type:'insert', i, insertAt:j+1, key, arr:[...a], sorted:i+1});
+  }
+  steps.push({type:'done', arr:[...a], sorted:a.length});
+  return steps;
+}
+
+function renderArr(a, sorted, keyIdx, shiftingIdx) {
+  const stage = document.getElementById('stage');
+  const indexRow = document.getElementById('index-row');
+  const n = a.length;
+  const stageW = stage.offsetWidth || 600;
+  const slotW = Math.floor(stageW / n);
+  const barW = Math.min(slotW - 8, 50);
+  stage.innerHTML = ''; indexRow.innerHTML = '';
+
+  a.forEach((val, idx) => {
+    const h = barHeight(val);
+    const el = document.createElement('div');
+    el.className = 'bar';
+    el.style.width = barW + 'px';
+    el.style.height = h + 'px';
+    el.style.left = (slotW * idx + (slotW - barW) / 2) + 'px';
+    el.style.bottom = '0';
+    el.style.background = barColor(val);
+    el.style.color = '#e2e8f0';
+    el.textContent = val;
+
+    if (idx < sorted && idx !== keyIdx && idx !== shiftingIdx) el.classList.add('sorted');
+    if (idx === keyIdx) el.classList.add('key');
+    if (idx === shiftingIdx) el.classList.add('shifting');
+
+    stage.appendChild(el);
+
+    const lbl = document.createElement('div');
+    lbl.style.cssText = 'width:' + slotW + 'px; text-align:center; font-size:10px; color:var(--color-text-secondary)';
+    lbl.textContent = idx;
+    indexRow.appendChild(lbl);
+  });
+}
+
+function init() {
+  clearInterval(autoTimer); autoTimer = null;
+  document.getElementById('btn-auto').textContent = 'Auto play';
+  arr = [...VALS]; shiftCount = 0; cmpCount = 0;
+  allSteps = buildSteps([...VALS]);
+  stepIdx = 0; updateSpeed();
+  renderArr(arr, 1, -1, -1);
+  document.getElementById('shift-count').textContent = '0';
+  document.getElementById('cmp-count').textContent = '0';
+  document.getElementById('pass-label').textContent = 'Pass 0 of ' + (arr.length - 1);
+  document.getElementById('step-log').textContent = 'Press Step or Auto play to begin';
+  document.getElementById('btn-step').disabled = false;
+}
+
+function updateSpeed() {
+  const v = parseInt(document.getElementById('speed').value);
+  speedMs = 1050 - v;
+  document.getElementById('speed-label').textContent = (v/500).toFixed(1) + '×';
+}
+
+function setLog(msg) {
+  const el = document.getElementById('step-log');
+  el.style.opacity = '0';
+  setTimeout(() => { el.textContent = msg; el.style.opacity = '1'; }, 120);
+}
+
+function applyStep(s) {
+  if (!s) return;
+  const n = VALS.length;
+  if (s.type === 'initial') { renderArr(s.arr, 1, -1, -1); setLog('Element [0]=' + s.arr[0] + ' is trivially sorted'); }
+  else if (s.type === 'pick-key') {
+    arr = [...s.arr];
+    document.getElementById('pass-label').textContent = 'Pass ' + s.i + ' of ' + (n-1);
+    renderArr(s.arr, s.sorted, s.i, -1);
+    setLog('Pick key = ' + s.key + ' at index ' + s.i + ' -insert into sorted region [0..' + (s.i-1) + ']');
+  }
+  else if (s.type === 'shift') {
+    cmpCount++; document.getElementById('cmp-count').textContent = cmpCount;
+    renderArr(s.arr, s.sorted, -1, s.j);
+    setLog('Compare: ' + s.arr[s.j] + ' > ' + s.key + '? Yes → shift [' + s.j + '] right');
+  }
+  else if (s.type === 'after-shift') {
+    shiftCount++; document.getElementById('shift-count').textContent = shiftCount;
+    arr = [...s.arr];
+    renderArr(s.arr, s.sorted, -1, s.j);
+    setLog('Shifted → gap at index ' + s.j);
+  }
+  else if (s.type === 'insert') {
+    arr = [...s.arr];
+    renderArr(s.arr, s.sorted, s.insertAt, -1);
+    setLog('Insert key=' + s.key + ' at index ' + s.insertAt + ' ✓');
+  }
+  else if (s.type === 'done') {
+    renderArr(s.arr, n, -1, -1);
+    setLog('Sorted! ' + shiftCount + ' shifts, ' + cmpCount + ' comparisons');
+    document.getElementById('pass-label').textContent = 'Done ✓';
+    document.getElementById('btn-step').disabled = true;
+    clearInterval(autoTimer); autoTimer = null;
+    document.getElementById('btn-auto').textContent = 'Auto play';
+  }
+}
+
+function stepOnce() { if (stepIdx >= allSteps.length) return; applyStep(allSteps[stepIdx]); stepIdx++; }
+
+function toggleAuto() {
+  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; document.getElementById('btn-auto').textContent = 'Auto play'; }
+  else { document.getElementById('btn-auto').textContent = 'Pause'; autoTimer = setInterval(() => { if (stepIdx >= allSteps.length) { clearInterval(autoTimer); autoTimer = null; document.getElementById('btn-auto').textContent = 'Auto play'; return; } applyStep(allSteps[stepIdx]); stepIdx++; }, speedMs); }
+}
+
+init();
+</script>

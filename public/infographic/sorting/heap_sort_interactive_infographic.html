@@ -1,0 +1,277 @@
+<style>
+  :root {
+    --color-text-primary: #e2e8f0;
+    --color-text-secondary: #94a3b8;
+    --color-text-info: #93c5fd;
+    --color-text-success: #6ee7b7;
+    --color-background-secondary: #0f172a;
+    --color-background-info: #1e3a5f;
+    --color-background-success: #064e3b;
+    --color-border-secondary: #334155;
+    --color-border-tertiary: #475569;
+    --color-border-success: #065f46;
+    --border-radius-md: 8px;
+  }
+  html, body { margin:0; padding:0; background:#020617; overflow:hidden; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+  @keyframes heapify-pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+  .node { display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:50%; font-size:13px; font-weight:600; transition:all 0.3s; cursor:default; user-select:none; }
+  .node.root { box-shadow:0 0 0 2.5px #EF9F27; background:#FAC775 !important; color:#1e293b; }
+  .node.comparing { box-shadow:0 0 0 2.5px #534AB7; background:#AFA9EC !important; }
+  .node.swapping { box-shadow:0 0 0 2.5px #EF9F27; animation: heapify-pulse 0.4s; }
+  .node.sorted { box-shadow:0 0 0 2.5px #0F6E56; background:#5DCAA5 !important; color:#1e293b; }
+  .node.normal { background:#334155; color:#e2e8f0; }
+  .bar { transition: left 0.3s, background 0.3s, box-shadow 0.3s; position:absolute; border-radius:6px 6px 0 0; display:flex; align-items:flex-start; justify-content:center; padding-top:5px; font-weight:500; font-size:11px; cursor:default; user-select:none; }
+  .bar.sorted { background:#5DCAA5 !important; box-shadow:0 0 0 2px #0F6E56; }
+  .bar.active { background:#FAC775 !important; box-shadow:0 0 0 2px #EF9F27; }
+  .btn { padding:6px 16px; border-radius:var(--border-radius-md); border:0.5px solid var(--color-border-secondary); background:transparent; color:var(--color-text-primary); cursor:pointer; font-size:13px; transition:background 0.15s; }
+  .btn:hover { background:var(--color-background-secondary); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn.primary { background:var(--color-background-info); color:var(--color-text-info); border-color:transparent; }
+  .btn.primary:hover { opacity:0.85; }
+  .legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .step-log { font-size:12px; color:var(--color-text-secondary); min-height:20px; transition:opacity 0.3s; }
+</style>
+
+<div style="padding:1.5rem 1rem 0">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px">
+    <div>
+      <span style="font-size:16px; font-weight:500; color:var(--color-text-primary)">Heap sort</span>
+      <span style="font-size:13px; color:var(--color-text-secondary); margin-left:8px">-build max-heap, extract max repeatedly</span>
+    </div>
+    <span id="step-label" style="font-size:12px; color:var(--color-text-secondary)">Step 0</span>
+  </div>
+
+  <div style="display:flex; gap:14px; margin-bottom:16px; flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#FAC775;box-shadow:0 0 0 2px #EF9F27"></span>Root / Active</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#AFA9EC;box-shadow:0 0 0 2px #534AB7"></span>Comparing</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#5DCAA5;box-shadow:0 0 0 2px #0F6E56"></span>Sorted</span>
+  </div>
+
+  <!-- Tree visualization -->
+  <div id="heap-tree" style="text-align:center; margin-bottom:12px; min-height:130px"></div>
+  
+  <!-- Array bar view -->
+  <div id="stage" style="position:relative; height:80px; margin-bottom:8px"></div>
+  <div id="index-row" style="display:flex; justify-content:space-around; margin-bottom:12px; padding:0 4px"></div>
+
+  <div id="step-log" class="step-log" style="margin-bottom:16px; text-align:center; min-height:18px"></div>
+
+  <div style="display:flex; gap:16px; margin-bottom:20px; flex-wrap:wrap">
+    <div style="flex:1; min-width:120px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:12px 16px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:4px">Swaps</div>
+      <div id="swap-count" style="font-size:22px; font-weight:500; color:var(--color-text-primary)">0</div>
+    </div>
+    <div style="flex:1; min-width:120px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:12px 16px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:4px">Comparisons</div>
+      <div id="cmp-count" style="font-size:22px; font-weight:500; color:var(--color-text-primary)">0</div>
+    </div>
+    <div style="flex:1; min-width:120px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:12px 16px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:4px">Phase</div>
+      <div id="phase-label" style="font-size:13px; font-weight:500; color:var(--color-text-info)">Build heap</div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+    <button class="btn primary" id="btn-step" onclick="stepOnce()">Step →</button>
+    <button class="btn" id="btn-auto" onclick="toggleAuto()">Auto play</button>
+    <button class="btn" id="btn-reset" onclick="init()">Reset</button>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:8px; font-size:12px; color:var(--color-text-secondary)">
+      Speed
+      <input type="range" id="speed" min="100" max="900" value="400" step="100" style="width:80px" oninput="updateSpeed()">
+      <span id="speed-label">0.8×</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const VALS = [72, 38, 91, 55, 18, 67, 44];
+let arr, allSteps, stepIdx, autoTimer, speedMs, swapCount, cmpCount;
+
+function buildSteps(startArr) {
+  const a = [...startArr], n = a.length, steps = [];
+  steps.push({type:'initial', arr:[...a], heapSize:n, phase:'build'});
+
+  function heapify(size, root, phase) {
+    let largest = root;
+    const left = 2 * root + 1, right = 2 * root + 2;
+    steps.push({type:'heapify-start', arr:[...a], root, size, phase});
+    if (left < size) {
+      steps.push({type:'compare', arr:[...a], parent:root, child:left, size, phase});
+      if (a[left] > a[largest]) largest = left;
+    }
+    if (right < size) {
+      steps.push({type:'compare', arr:[...a], parent:root, child:right, size, phase});
+      if (a[right] > a[largest]) largest = right;
+    }
+    if (largest !== root) {
+      [a[root], a[largest]] = [a[largest], a[root]];
+      steps.push({type:'swap', arr:[...a], i:root, j:largest, size, phase});
+      heapify(size, largest, phase);
+    }
+  }
+
+  // Build max heap
+  for (let i = Math.floor(n / 2) - 1; i >= 0; i--) {
+    heapify(n, i, 'build');
+  }
+  steps.push({type:'heap-built', arr:[...a], heapSize:n});
+
+  // Extract
+  for (let i = n - 1; i > 0; i--) {
+    [a[0], a[i]] = [a[i], a[0]];
+    steps.push({type:'extract', arr:[...a], extracted:i, val:a[i], heapSize:i});
+    heapify(i, 0, 'extract');
+  }
+  steps.push({type:'done', arr:[...a]});
+  return steps;
+}
+
+function renderTree(a, size, highlights) {
+  const container = document.getElementById('heap-tree');
+  const n = Math.min(a.length, size);
+  // Render as levels
+  let html = '';
+  let idx = 0;
+  for (let level = 0; idx < n; level++) {
+    const count = Math.min(Math.pow(2, level), n - idx);
+    html += '<div style="display:flex; justify-content:center; gap:' + Math.max(4, 40 - level * 12) + 'px; margin-bottom:6px">';
+    for (let c = 0; c < count && idx < n; c++, idx++) {
+      let cls = 'normal';
+      if (highlights.sorted && highlights.sorted.has(idx)) cls = 'sorted';
+      else if (highlights.root === idx) cls = 'root';
+      else if (highlights.comparing === idx) cls = 'comparing';
+      else if (highlights.swapPair && highlights.swapPair.includes(idx)) cls = 'comparing';
+      html += '<span class="node ' + cls + '">' + a[idx] + '</span>';
+    }
+    html += '</div>';
+  }
+  container.innerHTML = html;
+}
+
+function renderBars(a, size, highlights) {
+  const stage = document.getElementById('stage');
+  const indexRow = document.getElementById('index-row');
+  const n = a.length;
+  const stageW = stage.offsetWidth || 600;
+  const slotW = Math.floor(stageW / n);
+  const barW = Math.min(slotW - 6, 40);
+  stage.innerHTML = ''; indexRow.innerHTML = '';
+
+  const mn = Math.min(...VALS), mx = Math.max(...VALS);
+  a.forEach((val, idx) => {
+    const h = 20 + Math.round((val - mn) / (mx - mn) * 50);
+    const el = document.createElement('div');
+    el.className = 'bar';
+    el.style.width = barW + 'px';
+    el.style.height = h + 'px';
+    el.style.left = (slotW * idx + (slotW - barW) / 2) + 'px';
+    el.style.bottom = '0';
+    el.style.background = `hsl(210, 30%, ${50 + ((val-mn)/(mx-mn))*20}%)`;
+    el.style.color = '#e2e8f0';
+    el.textContent = val;
+
+    if (highlights.sorted && highlights.sorted.has(idx)) el.classList.add('sorted');
+    else if (highlights.root === idx || (highlights.swapPair && highlights.swapPair.includes(idx))) el.classList.add('active');
+
+    stage.appendChild(el);
+
+    const lbl = document.createElement('div');
+    lbl.style.cssText = 'width:' + slotW + 'px; text-align:center; font-size:10px; color:var(--color-text-secondary)';
+    lbl.textContent = idx;
+    indexRow.appendChild(lbl);
+  });
+}
+
+let sortedSet = new Set();
+
+function init() {
+  clearInterval(autoTimer); autoTimer = null;
+  document.getElementById('btn-auto').textContent = 'Auto play';
+  arr = [...VALS]; swapCount = 0; cmpCount = 0;
+  sortedSet = new Set();
+  allSteps = buildSteps([...VALS]);
+  stepIdx = 0; updateSpeed();
+  const hl = {sorted: sortedSet};
+  renderTree(arr, arr.length, hl);
+  renderBars(arr, arr.length, hl);
+  document.getElementById('swap-count').textContent = '0';
+  document.getElementById('cmp-count').textContent = '0';
+  document.getElementById('step-label').textContent = 'Step 0';
+  document.getElementById('phase-label').textContent = 'Build heap';
+  document.getElementById('step-log').textContent = 'Press Step or Auto play to begin';
+  document.getElementById('btn-step').disabled = false;
+}
+
+function updateSpeed() {
+  const v = parseInt(document.getElementById('speed').value);
+  speedMs = 1200 - v;
+  document.getElementById('speed-label').textContent = (v/500).toFixed(1) + '×';
+}
+
+function setLog(msg) {
+  const el = document.getElementById('step-log');
+  el.style.opacity = '0';
+  setTimeout(() => { el.textContent = msg; el.style.opacity = '1'; }, 120);
+}
+
+function applyStep(s) {
+  if (!s) return;
+  arr = [...s.arr];
+  document.getElementById('step-label').textContent = 'Step ' + stepIdx;
+  const size = s.heapSize || s.size || arr.length;
+  const hl = {sorted: sortedSet};
+
+  if (s.phase === 'extract') document.getElementById('phase-label').textContent = 'Extract max';
+  else document.getElementById('phase-label').textContent = 'Build heap';
+
+  if (s.type === 'initial') { renderTree(arr, size, hl); renderBars(arr, size, hl); setLog('Array: [' + arr.join(', ') + '] -building max-heap bottom-up'); }
+  else if (s.type === 'heapify-start') {
+    hl.root = s.root;
+    renderTree(arr, size, hl); renderBars(arr, size, hl);
+    setLog('Heapify at index ' + s.root + ' (value=' + arr[s.root] + ')');
+  }
+  else if (s.type === 'compare') {
+    cmpCount++; document.getElementById('cmp-count').textContent = cmpCount;
+    hl.root = s.parent; hl.comparing = s.child;
+    renderTree(arr, size, hl); renderBars(arr, size, hl);
+    setLog('Compare parent [' + s.parent + ']=' + arr[s.parent] + ' with child [' + s.child + ']=' + arr[s.child]);
+  }
+  else if (s.type === 'swap') {
+    swapCount++; document.getElementById('swap-count').textContent = swapCount;
+    hl.swapPair = [s.i, s.j];
+    renderTree(arr, size, hl); renderBars(arr, size, hl);
+    setLog('Swap [' + s.i + ']↔[' + s.j + '] → ' + arr[s.i] + ' ↔ ' + arr[s.j]);
+  }
+  else if (s.type === 'heap-built') {
+    renderTree(arr, size, hl); renderBars(arr, size, hl);
+    setLog('Max-heap built! Root = ' + arr[0] + ' (maximum)');
+    document.getElementById('phase-label').textContent = 'Extract max';
+  }
+  else if (s.type === 'extract') {
+    sortedSet.add(s.extracted);
+    hl.sorted = sortedSet;
+    renderTree(arr, s.heapSize, hl); renderBars(arr, arr.length, hl);
+    setLog('Extract max ' + s.val + ' → placed at index ' + s.extracted);
+  }
+  else if (s.type === 'done') {
+    sortedSet = new Set(VALS.map((_, i) => i));
+    hl.sorted = sortedSet;
+    renderTree(arr, 0, hl); renderBars(arr, arr.length, hl);
+    setLog('Sorted! ' + swapCount + ' swaps, ' + cmpCount + ' comparisons -O(n log n)');
+    document.getElementById('step-label').textContent = 'Done ✓';
+    document.getElementById('phase-label').textContent = 'Complete';
+    document.getElementById('btn-step').disabled = true;
+    clearInterval(autoTimer); autoTimer = null;
+    document.getElementById('btn-auto').textContent = 'Auto play';
+  }
+}
+
+function stepOnce() { if (stepIdx >= allSteps.length) return; applyStep(allSteps[stepIdx]); stepIdx++; }
+
+function toggleAuto() {
+  if (autoTimer) { clearInterval(autoTimer); autoTimer = null; document.getElementById('btn-auto').textContent = 'Auto play'; }
+  else { document.getElementById('btn-auto').textContent = 'Pause'; autoTimer = setInterval(() => { if (stepIdx >= allSteps.length) { clearInterval(autoTimer); autoTimer = null; document.getElementById('btn-auto').textContent = 'Auto play'; return; } applyStep(allSteps[stepIdx]); stepIdx++; }, speedMs); }
+}
+
+init();
+</script>

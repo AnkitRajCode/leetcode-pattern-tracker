@@ -1,0 +1,178 @@
+<style>
+  :root {
+    --color-text-primary: #e2e8f0;
+    --color-text-secondary: #94a3b8;
+    --color-text-info: #93c5fd;
+    --color-text-success: #6ee7b7;
+    --color-background-secondary: #0f172a;
+    --color-background-info: #1e3a5f;
+    --color-border-secondary: #334155;
+    --border-radius-md: 8px;
+  }
+  html, body { margin:0; padding:0; background:#020617; overflow:hidden; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; }
+  @keyframes rise { 0%{transform:translateY(0)} 50%{transform:translateY(-8px)} 100%{transform:translateY(0)} }
+  @keyframes swap-anim { 0%{transform:translateX(0)} 30%{transform:translateX(4px)} 70%{transform:translateX(-4px)} 100%{transform:translateX(0)} }
+  .bubble { transition: left 0.45s cubic-bezier(.4,0,.2,1), background 0.3s, box-shadow 0.3s; position:absolute; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:500; cursor:default; user-select:none; }
+  .bubble.sorted { box-shadow: 0 0 0 2.5px #0F6E56; }
+  .bubble.comparing { box-shadow: 0 0 0 3px #534AB7; animation: rise 0.5s ease-in-out; }
+  .bubble.swapping { box-shadow: 0 0 0 3px #EF9F27; animation: swap-anim 0.45s ease-in-out; }
+  .direction-indicator { display:inline-flex; align-items:center; gap:6px; padding:4px 14px; border-radius:20px; font-size:12px; font-weight:500; }
+  .btn { padding:6px 16px; border-radius:var(--border-radius-md); border:0.5px solid var(--color-border-secondary); background:transparent; color:var(--color-text-primary); cursor:pointer; font-size:13px; transition:background 0.15s; }
+  .btn:hover { background:var(--color-background-secondary); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn.primary { background:var(--color-background-info); color:var(--color-text-info); border-color:transparent; }
+  .legend-dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .step-log { font-size:12px; color:var(--color-text-secondary); min-height:20px; transition:opacity 0.3s; }
+</style>
+
+<div style="padding:1.5rem 1rem 0">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px">
+    <div>
+      <span style="font-size:16px; font-weight:500; color:var(--color-text-primary)">Cocktail sort</span>
+      <span style="font-size:13px; color:var(--color-text-secondary); margin-left:8px">-bidirectional bubble sort</span>
+    </div>
+    <span id="pass-label" style="font-size:12px; color:var(--color-text-secondary)">Pass 0</span>
+  </div>
+
+  <div style="display:flex; gap:14px; margin-bottom:20px; flex-wrap:wrap">
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#AFA9EC;box-shadow:0 0 0 2px #534AB7"></span>Comparing</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#FAC775;box-shadow:0 0 0 2px #EF9F27"></span>Swapping</span>
+    <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)"><span class="legend-dot" style="background:#5DCAA5;box-shadow:0 0 0 2px #0F6E56"></span>Sorted</span>
+  </div>
+
+  <div id="direction-display" style="text-align:center; margin-bottom:12px">
+    <span class="direction-indicator" style="background:var(--color-background-secondary); color:var(--color-text-info); border:1px solid var(--color-border-secondary)">→ Forward pass</span>
+  </div>
+
+  <div id="stage" style="position:relative; height:110px; margin-bottom:12px"></div>
+  <div id="index-row" style="display:flex; justify-content:space-around; margin-bottom:16px; padding:0 4px"></div>
+  <div id="step-log" class="step-log" style="margin-bottom:14px; text-align:center"></div>
+
+  <div style="display:flex; gap:16px; margin-bottom:16px; flex-wrap:wrap">
+    <div style="flex:1; min-width:100px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:3px">Swaps</div>
+      <div id="swap-count" style="font-size:20px; font-weight:500; color:var(--color-text-primary)">0</div>
+    </div>
+    <div style="flex:1; min-width:100px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:3px">Comparisons</div>
+      <div id="cmp-count" style="font-size:20px; font-weight:500; color:var(--color-text-primary)">0</div>
+    </div>
+    <div style="flex:2; min-width:160px; background:var(--color-background-secondary); border-radius:var(--border-radius-md); padding:10px 14px">
+      <div style="font-size:11px; color:var(--color-text-secondary); margin-bottom:3px">Key insight</div>
+      <div style="font-size:12px; font-weight:500; color:var(--color-text-secondary)">Fixes "turtle" problem -small values at end move faster</div>
+    </div>
+  </div>
+
+  <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center">
+    <button class="btn primary" id="btn-step" onclick="stepOnce()">Step →</button>
+    <button class="btn" id="btn-auto" onclick="toggleAuto()">Auto play</button>
+    <button class="btn" id="btn-reset" onclick="init()">Reset</button>
+    <div style="margin-left:auto; display:flex; align-items:center; gap:8px; font-size:12px; color:var(--color-text-secondary)">
+      Speed <input type="range" id="speed" min="100" max="900" value="500" step="100" style="width:80px" oninput="updateSpeed()">
+      <span id="speed-label">1.0×</span>
+    </div>
+  </div>
+</div>
+
+<script>
+const VALS = [72, 38, 91, 55, 18, 67, 44];
+const COLORS_BY_SIZE = ['#D3D1C7','#B4B2A9','#9FE1CB','#5DCAA5','#AFA9EC','#7F77DD','#534AB7'];
+let arr, allSteps, stepIdx, autoTimer, speedMs, swapCount, cmpCount;
+
+function bubbleColor(val){const mn=Math.min(...VALS),mx=Math.max(...VALS);const idx=Math.round((val-mn)/(mx-mn)*(COLORS_BY_SIZE.length-1));return COLORS_BY_SIZE[idx];}
+function bubbleSize(val){const mn=Math.min(...VALS),mx=Math.max(...VALS);return 38+Math.round((val-mn)/(mx-mn)*32);}
+
+function buildSteps(startArr) {
+  const a=[...startArr], n=a.length, steps=[];
+  let start=0, end=n-1, swapped=true;
+  steps.push({type:'initial',arr:[...a],start,end});
+
+  while(swapped) {
+    swapped=false;
+    // Forward pass
+    steps.push({type:'direction',arr:[...a],dir:'forward',start,end});
+    for(let i=start;i<end;i++) {
+      steps.push({type:'compare',arr:[...a],i,j:i+1,dir:'forward',start,end});
+      if(a[i]>a[i+1]) {
+        [a[i],a[i+1]]=[a[i+1],a[i]]; swapped=true;
+        steps.push({type:'swap',arr:[...a],i,j:i+1,dir:'forward',start,end});
+      }
+    }
+    end--;
+    steps.push({type:'boundary',arr:[...a],dir:'forward',start,end,sorted:end+1});
+
+    if(!swapped) break;
+    swapped=false;
+
+    // Backward pass
+    steps.push({type:'direction',arr:[...a],dir:'backward',start,end});
+    for(let i=end-1;i>=start;i--) {
+      steps.push({type:'compare',arr:[...a],i,j:i+1,dir:'backward',start,end});
+      if(a[i]>a[i+1]) {
+        [a[i],a[i+1]]=[a[i+1],a[i]]; swapped=true;
+        steps.push({type:'swap',arr:[...a],i,j:i+1,dir:'backward',start,end});
+      }
+    }
+    start++;
+    steps.push({type:'boundary',arr:[...a],dir:'backward',start,end,sorted:start-1});
+  }
+  steps.push({type:'done',arr:[...a]});
+  return steps;
+}
+
+function renderArr(a, comparing, swapping, start, end) {
+  const stage=document.getElementById('stage'),indexRow=document.getElementById('index-row');
+  const n=a.length,stageW=stage.offsetWidth||620,slotW=Math.floor(stageW/n);
+  stage.innerHTML='';indexRow.innerHTML='';
+  a.forEach((val,idx)=>{
+    const size=bubbleSize(val), cx=slotW*idx+slotW/2-size/2, cy=(110-size)/2;
+    const el=document.createElement('div');
+    el.className='bubble';el.style.width=size+'px';el.style.height=size+'px';
+    el.style.left=cx+'px';el.style.top=cy+'px';
+    el.style.background=bubbleColor(val);el.style.fontSize=Math.max(11,size*0.3)+'px';el.style.color='#1e293b';el.textContent=val;
+    if(idx<start||idx>end) {el.classList.add('sorted');el.style.background='#5DCAA5';}
+    else if(swapping.includes(idx)){el.classList.add('swapping');el.style.background='#FAC775';}
+    else if(comparing.includes(idx)){el.classList.add('comparing');el.style.background='#AFA9EC';}
+    stage.appendChild(el);
+    const lbl=document.createElement('div');
+    lbl.style.cssText='width:'+slotW+'px;text-align:center;font-size:10px;color:var(--color-text-secondary)';
+    lbl.textContent=idx;indexRow.appendChild(lbl);
+  });
+}
+
+function init(){
+  clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';
+  arr=[...VALS];swapCount=0;cmpCount=0;
+  allSteps=buildSteps([...VALS]);stepIdx=0;updateSpeed();
+  renderArr(arr,[],[],0,arr.length-1);
+  document.getElementById('swap-count').textContent='0';
+  document.getElementById('cmp-count').textContent='0';
+  document.getElementById('pass-label').textContent='Pass 0';
+  document.getElementById('step-log').textContent='Press Step or Auto play to begin';
+  document.getElementById('btn-step').disabled=false;
+}
+
+function updateSpeed(){const v=parseInt(document.getElementById('speed').value);speedMs=1050-v;document.getElementById('speed-label').textContent=(v/500).toFixed(1)+'×';}
+function setLog(msg){const el=document.getElementById('step-log');el.style.opacity='0';setTimeout(()=>{el.textContent=msg;el.style.opacity='1';},120);}
+
+function applyStep(s){
+  if(!s)return;
+  arr=[...s.arr];
+  const start=s.start||0, end=s.end||arr.length-1;
+  if(s.type==='initial'){renderArr(s.arr,[],[],0,arr.length-1);setLog('Array: ['+s.arr.join(', ')+']');}
+  else if(s.type==='direction'){
+    const d=document.getElementById('direction-display');
+    d.innerHTML='<span class="direction-indicator" style="background:var(--color-background-secondary);color:var(--color-text-info);border:1px solid var(--color-border-secondary)">'+(s.dir==='forward'?'→ Forward pass':'← Backward pass')+'</span>';
+    renderArr(s.arr,[],[],start,end);setLog((s.dir==='forward'?'Forward':'Backward')+' pass -scan '+(s.dir==='forward'?'left→right':'right→left'));
+  }
+  else if(s.type==='compare'){cmpCount++;document.getElementById('cmp-count').textContent=cmpCount;renderArr(s.arr,[s.i,s.j],[],start,end);setLog('Compare ['+s.i+']='+s.arr[s.i]+' vs ['+s.j+']='+s.arr[s.j]);}
+  else if(s.type==='swap'){swapCount++;document.getElementById('swap-count').textContent=swapCount;renderArr(s.arr,[],[s.i,s.j],start,end);setLog('Swap! '+s.arr[s.i]+' ↔ '+s.arr[s.j]);}
+  else if(s.type==='boundary'){renderArr(s.arr,[],[],start,end);setLog((s.dir==='forward'?'Max':'Min')+' placed -boundary shrinks');}
+  else if(s.type==='done'){renderArr(s.arr,[],[],arr.length,0);setLog('Sorted! '+swapCount+' swaps, '+cmpCount+' comparisons');document.getElementById('pass-label').textContent='Done ✓';document.getElementById('btn-step').disabled=true;clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';}
+}
+
+function stepOnce(){if(stepIdx>=allSteps.length)return;applyStep(allSteps[stepIdx]);stepIdx++;}
+function toggleAuto(){if(autoTimer){clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';}else{document.getElementById('btn-auto').textContent='Pause';autoTimer=setInterval(()=>{if(stepIdx>=allSteps.length){clearInterval(autoTimer);autoTimer=null;document.getElementById('btn-auto').textContent='Auto play';return;}applyStep(allSteps[stepIdx]);stepIdx++;},speedMs);}}
+
+init();
+</script>

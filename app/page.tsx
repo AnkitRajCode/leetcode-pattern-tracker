@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { BookOpen, Code2, Cpu, GraduationCap, Link2, Layers, Github, Twitter, Linkedin, Globe } from "lucide-react";
+import { BookOpen, Code2, Cpu, GraduationCap, Link2, Layers, Globe } from "lucide-react";
+import { Github, Twitter, Linkedin } from "@/components/icons/BrandIcons";
 import UserNav from "@/components/UserNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import SystemDesignModal from "@/components/SystemDesignModal";
+import AlgorithmsModal from "@/components/AlgorithmsModal";
 
 const topics = [
   { id: "arrays", name: "Arrays & Hashing", icon: <Code2 className="text-blue-500" />, description: "Master the foundation of DSA with pattern-based array problems." },
@@ -17,15 +19,17 @@ const topics = [
 
 export default function Home() {
   const [sdModalOpen, setSdModalOpen] = useState(false);
+  const [algoModalOpen, setAlgoModalOpen] = useState(false);
 
   return (
     <main className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-50 via-white to-white dark:from-slate-900 dark:via-slate-950 dark:to-slate-950 p-6 md:p-12 lg:p-24 transition-colors duration-500">
       <div className="max-w-5xl mx-auto space-y-12 text-slate-900 dark:text-white">
         <div className="flex justify-end items-center gap-4">
-          <UserNav onOpenSystemDesign={() => setSdModalOpen(true)} />
+          <UserNav onOpenSystemDesign={() => setSdModalOpen(true)} onOpenAlgorithms={() => setAlgoModalOpen(true)} />
           <ThemeToggle />
         </div>
         <SystemDesignModal isOpen={sdModalOpen} onClose={() => setSdModalOpen(false)} />
+        <AlgorithmsModal isOpen={algoModalOpen} onClose={() => setAlgoModalOpen(false)} />
         <div className="space-y-4 text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-widest mb-4">
             <GraduationCap size={14} />
@@ -88,7 +92,7 @@ export default function Home() {
             <div className="flex flex-col items-center md:items-end gap-4">
               <div className="flex items-center gap-4">
                 {[
-                  { icon: <Globe size={20} />, href: "https://ankitraj.pages.dev", label: "Portfolio" },
+                  { icon: <Globe size={20} />, href: "https://ankitrajcode.in", label: "Portfolio" },
                   { icon: <Github size={20} />, href: "https://github.com/AnkitRajCode", label: "GitHub" },
                   { icon: <Twitter size={20} />, href: "https://twitter.com/AnkitRajCode", label: "Twitter" },
                   { icon: <Linkedin size={20} />, href: "https://linkedin.com/in/AnkitRajCode", label: "LinkedIn" }
@@ -108,7 +112,7 @@ export default function Home() {
               <p className="text-xs font-bold text-slate-500 dark:text-slate-500 flex items-center gap-1.5">
                 Made by
                 <a
-                  href="https://ankitraj.pages.dev"
+                  href="https://ankitrajcode.in"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"

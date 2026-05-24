@@ -2,6 +2,7 @@
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
@@ -14,6 +15,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
         <div className="markdown-content prose prose-slate max-w-none dark:prose-invert transition-colors duration-500 bg-white dark:bg-slate-950 p-6 rounded-xl border border-transparent dark:border-slate-900 shadow-sm">
             <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeRaw]}
                 components={{
                     code({ node, inline, className, children, ...props }: any) {
                         const match = /language-(\w+)/.exec(className || "");
@@ -56,6 +58,9 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
                     ),
                     th: ({ children }) => <th className="bg-slate-50 dark:bg-slate-900 p-3 font-bold text-slate-900 dark:text-white border-b dark:border-slate-800">{children}</th>,
                     td: ({ children }) => <td className="p-3 border-b dark:border-slate-800 text-slate-600 dark:text-slate-400">{children}</td>,
+                    img: ({ src, alt }) => (
+                        <img src={src} alt={alt || ''} className="rounded-lg border border-slate-200 dark:border-slate-700 my-4 max-w-full h-auto shadow-sm" />
+                    ),
                     hr: () => <hr className="my-8 border-slate-200 dark:border-slate-800" />,
                     strong: ({ children }) => <strong className="font-bold text-slate-900 dark:text-white">{children}</strong>,
                 }}

@@ -1,6 +1,7 @@
 "use client";
 
-import { Github, Twitter, Linkedin, Globe, Code } from "lucide-react";
+import { Globe, Code } from "lucide-react";
+import { Github, Twitter, Linkedin } from "@/components/icons/BrandIcons";
 
 export default function Footer() {
     return (
@@ -23,7 +24,7 @@ export default function Footer() {
                 <div className="flex flex-col items-center md:items-end gap-4">
                     <div className="flex items-center gap-4">
                         {[
-                            { icon: <Globe size={20} />, href: "https://ankitraj.pages.dev", label: "Portfolio" },
+                            { icon: <Globe size={20} />, href: "https://ankitrajcode.in", label: "Portfolio" },
                             { icon: <Github size={20} />, href: "https://github.com/AnkitRajCode", label: "GitHub" },
                             { icon: <Twitter size={20} />, href: "https://twitter.com/AnkitRajCode", label: "Twitter" },
                             { icon: <Linkedin size={20} />, href: "https://linkedin.com/in/AnkitRajCode", label: "LinkedIn" }
@@ -43,7 +44,7 @@ export default function Footer() {
                     <p className="text-xs font-bold text-slate-500 dark:text-slate-500 flex items-center gap-1.5 pt-2">
                         Made by
                         <a
-                            href="https://ankitraj.pages.dev"
+                            href="https://ankitrajcode.in"
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
