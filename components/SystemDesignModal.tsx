@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { X, BookMarked, ChevronRight, Loader2, ServerCog } from "lucide-react";
+import { X, BookMarked, ChevronRight, ChevronLeft, Loader2, ServerCog } from "lucide-react";
 import MarkdownRenderer from "@/components/MarkdownRenderer";
 
 interface SystemDesignFile {
@@ -22,11 +22,13 @@ export default function SystemDesignModal({ isOpen, onClose }: SystemDesignModal
   const [title, setTitle] = useState<string>("");
   const [loadingFiles, setLoadingFiles] = useState(false);
   const [loadingContent, setLoadingContent] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(true);
 
   // Load file list when modal opens
   useEffect(() => {
     if (!isOpen) return;
     setLoadingFiles(true);
+    setShowSidebar(true);
     fetch("/api/system-design")
       .then((res) => res.json())
       .then((data) => {
@@ -115,7 +117,7 @@ export default function SystemDesignModal({ isOpen, onClose }: SystemDesignModal
         {/* Body */}
         <div className="flex flex-1 overflow-hidden">
           {/* Sidebar */}
-          <aside className="w-64 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 overflow-y-auto">
+          <aside className={`${showSidebar ? 'flex' : 'hidden md:flex'} flex-col w-full md:w-64 shrink-0 border-r border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 overflow-y-auto`}>
             <div className="p-3">
               <p className="text-xs font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500 px-2 mb-2">
                 Topics
@@ -136,7 +138,7 @@ export default function SystemDesignModal({ isOpen, onClose }: SystemDesignModal
                       <li key={file.slug}>
                         <button
                           id={`sd-tab-${file.slug}`}
-                          onClick={() => setSelectedSlug(file.slug)}
+                          onClick={() => { setSelectedSlug(file.slug); setShowSidebar(false); }}
                           className={`w-full cursor-pointer flex items-center gap-2 px-3 py-2.5 rounded-lg text-left text-sm font-medium transition-all duration-200 group ${
                             isActive
                               ? "bg-yellow-600 text-white shadow-sm shadow-yellow-500/20"
@@ -162,7 +164,17 @@ export default function SystemDesignModal({ isOpen, onClose }: SystemDesignModal
           </aside>
 
           {/* Content area */}
-          <main className="flex-1 overflow-y-auto">
+          <main className={`${showSidebar ? 'hidden md:flex' : 'flex'} flex-col flex-1 overflow-y-auto`}>
+            {/* Mobile back button */}
+            <div className="flex items-center gap-2 px-4 py-2 border-b border-slate-200 dark:border-slate-800 md:hidden shrink-0">
+              <button
+                onClick={() => setShowSidebar(true)}
+                className="flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+              >
+                <ChevronLeft size={16} />
+                Topics
+              </button>
+            </div>
             {loadingContent ? (
               <div className="flex flex-col items-center justify-center h-full gap-3 text-slate-400">
                 <Loader2 size={28} className="animate-spin text-yellow-500" />
