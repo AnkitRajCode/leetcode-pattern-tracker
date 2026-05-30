@@ -1,9 +1,3 @@
-# Apache Kafka
-
-**Date:** 5/24/2026
-
----
-
 ## Core Synthesis
 
 ### **Core Message**
