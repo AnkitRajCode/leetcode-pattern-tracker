@@ -183,7 +183,7 @@ export default function SystemDesignModal({ isOpen, onClose }: SystemDesignModal
             ) : content ? (
               <div className="p-6 md:p-8">
                 {/* File title banner */}
-                <div className="mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
+                <div className="pb-4 border-b border-slate-100 dark:border-slate-800">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-xs font-bold uppercase tracking-widest text-yellow-500">System Design</span>
                   </div>

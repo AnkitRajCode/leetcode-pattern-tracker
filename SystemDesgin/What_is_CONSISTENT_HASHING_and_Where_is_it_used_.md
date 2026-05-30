@@ -1,10 +1,3 @@
-# What is CONSISTENT HASHING and Where is it used?
-
-**Date:** 2/11/2026
-**Source:** https://www.youtube.com/watch?v=zaRkONvyGr8
-
----
-
 ## Core Synthesis
 
 ### **Core Message**

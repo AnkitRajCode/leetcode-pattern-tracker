@@ -1,5 +1,3 @@
-# SQL vs NoSQL
-
 ![SQL vs noSQL](/infographic/systemDesgin/sql.png)
 
 ---
